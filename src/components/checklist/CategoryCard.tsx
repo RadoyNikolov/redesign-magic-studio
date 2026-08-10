@@ -129,7 +129,7 @@ export function CategoryCard({
 
   return (
     <section
-      className="overflow-hidden rounded-xl border border-border bg-card shadow-panel"
+      className="rounded-xl border border-border bg-card shadow-panel"
       style={{ borderLeft: `3px solid ${color}` }}
     >
       <div
