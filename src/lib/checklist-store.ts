@@ -121,7 +121,8 @@ export function loadState(): State {
         });
         if (d.view === undefined) d.view = "checklist";
         d.categories.forEach((c: Category) => {
-          if (RENAMES[c.name]) c.name = RENAMES[c.name];
+          const renamed = RENAMES[c.name];
+          if (renamed) c.name = renamed;
         });
         const existingNames = new Set(d.categories.map((c: Category) => c.name));
         Object.keys(GEAR).forEach((name) => {
