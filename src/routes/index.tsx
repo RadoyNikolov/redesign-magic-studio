@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
 import { catColor, extractMm, uid } from "@/data/gear";
 import { useChecklist, type Item, type Status } from "@/lib/checklist-store";
-import { AddRow } from "@/components/checklist/AddRow";
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
 import { SetupScreen } from "@/components/checklist/SetupScreen";
