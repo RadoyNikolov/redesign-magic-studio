@@ -42,6 +42,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  --color-elevated: var(--elevated);
   --color-have: var(--have);
   --color-look: var(--look);
   --color-tbc: var(--tbc);
@@ -50,6 +51,7 @@
   --color-return: var(--return);
 
   --shadow-panel: var(--shadow-panel);
+  --shadow-lift: var(--shadow-lift);
 }
 
 :root {
