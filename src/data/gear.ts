@@ -1432,4 +1432,18 @@ const MONITOR_FAMILIES = [
 MONITOR_FAMILIES.forEach(([brand, models]) => addMonitorFamily(brand, models));
 
 
-export { uid, CATEGORY_COLOR_MAP, CATEGORY_PALETTE, catColor, GEAR, SUGGESTIONS, FAMILIES, wholeSetName, variantName, extractMm };
+const FAMILIES_TYPED: any[] = FAMILIES;
+const SUGGESTIONS_TYPED: any[] = SUGGESTIONS;
+const PALETTE_TYPED: string[] = CATEGORY_PALETTE;
+export {
+  uid,
+  CATEGORY_COLOR_MAP,
+  PALETTE_TYPED as CATEGORY_PALETTE,
+  catColor,
+  GEAR,
+  SUGGESTIONS_TYPED as SUGGESTIONS,
+  FAMILIES_TYPED as FAMILIES,
+  wholeSetName,
+  variantName,
+  extractMm,
+};
