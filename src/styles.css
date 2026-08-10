@@ -50,7 +50,6 @@
   --color-return: var(--return);
 
   --shadow-panel: var(--shadow-panel);
-  --shadow-lift: var(--shadow-lift);
 }
 
 :root {
