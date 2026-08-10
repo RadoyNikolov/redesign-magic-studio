@@ -1,0 +1,512 @@
+import { useMemo, useRef, useState } from "react";
+import { FAMILIES, SUGGESTIONS } from "@/data/gear";
+import type { Category } from "@/lib/checklist-store";
+
+type Family = {
+  cat: string;
+  label: string;
+  info: string | null;
+  wholeSetSpec: string | null;
+  variants: string[];
+  group?: string | null;
+};
+type Flat = { name: string; qty: number; cat: string; group: string | null };
+
+type Props = {
+  cat: Category;
+  onAdd: (name: string, qty: number, group?: string | null) => void;
+  onAddFamily: (family: Family, selectedIdx: number[], qty: number) => void;
+};
+
+type Mode = "closed" | "search" | "browseCats" | "browseItems" | "picker";
+
+function getCategoryGroups(catName: string) {
+  const groups = new Map<string, { flats: Flat[]; families: Family[] }>();
+  (SUGGESTIONS as Flat[]).forEach((s) => {
+    if (s.cat !== catName || !s.group) return;
+    if (!groups.has(s.group)) groups.set(s.group, { flats: [], families: [] });
+    groups.get(s.group)!.flats.push(s);
+  });
+  (FAMILIES as Family[]).forEach((f) => {
+    if (f.cat !== catName || !f.group) return;
+    if (!groups.has(f.group)) groups.set(f.group, { flats: [], families: [] });
+    groups.get(f.group)!.families.push(f);
+  });
+  return groups;
+}
+
+function getAllCategoryItems(catName: string) {
+  const families = (FAMILIES as Family[])
+    .filter((f) => f.cat === catName)
+    .sort((a, b) => a.label.localeCompare(b.label));
+  const flats = (SUGGESTIONS as Flat[])
+    .filter((s) => s.cat === catName)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return { families, flats };
+}
+
+const panelCls =
+  "absolute left-0 right-0 top-[calc(100%+6px)] z-30 max-h-[340px] overflow-y-auto rounded-lg border border-border bg-popover shadow-lift";
+const rowCls =
+  "flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent";
+const chevronCls =
+  "ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-primary";
+
+export function AddRow({ cat, onAdd, onAddFamily }: Props) {
+  const [q, setQ] = useState("");
+  const [qty, setQty] = useState(1);
+  const [mode, setMode] = useState<Mode>("closed");
+  const [sel, setSel] = useState(-1);
+  const [family, setFamily] = useState<Family | null>(null);
+  const [checked, setChecked] = useState<Set<number>>(new Set());
+  const [wholeSet, setWholeSet] = useState(false);
+  const [pickerFilter, setPickerFilter] = useState("");
+  const [browseGroup, setBrowseGroup] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const results = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    if (!query) return [] as ({ kind: "family"; family: Family } | { kind: "flat"; item: Flat })[];
+    const fams = (FAMILIES as Family[])
+      .filter((f) => f.cat === cat.name && f.label.toLowerCase().includes(query))
+      .map((f) => ({ kind: "family" as const, family: f }));
+    const flats = (SUGGESTIONS as Flat[])
+      .filter((s) => s.cat === cat.name && s.name.toLowerCase().includes(query))
+      .map((s) => ({ kind: "flat" as const, item: s }));
+    return [...fams, ...flats].slice(0, 20);
+  }, [q, cat.name]);
+
+  const closeAll = () => {
+    setMode("closed");
+    setFamily(null);
+    setChecked(new Set());
+    setWholeSet(false);
+    setPickerFilter("");
+    setBrowseGroup(null);
+    setSel(-1);
+  };
+
+  const openPicker = (f: Family) => {
+    setFamily(f);
+    setChecked(new Set());
+    setWholeSet(false);
+    setPickerFilter("");
+    setMode("picker");
+  };
+
+  const addFlat = (name: string, itemQty: number, group?: string | null) => {
+    onAdd(name, Math.max(1, itemQty || 1), group ?? null);
+    setQ("");
+    closeAll();
+    inputRef.current?.focus();
+  };
+
+  const commitPicker = () => {
+    if (!family) return;
+    const selectedIdx = wholeSet
+      ? family.variants.map((_, i) => i)
+      : [...checked];
+    if (selectedIdx.length === 0) return;
+    onAddFamily(family, selectedIdx, Math.max(1, qty || 1));
+    setQ("");
+    closeAll();
+    inputRef.current?.focus();
+  };
+
+  const stop = (e: React.MouseEvent) => e.preventDefault();
+
+  const browseOpen = () => {
+    if (mode !== "closed") {
+      closeAll();
+      return;
+    }
+    setQ("");
+    setBrowseGroup(null);
+    const groups = getCategoryGroups(cat.name);
+    setMode(groups.size > 0 ? "browseCats" : "browseItems");
+    inputRef.current?.focus();
+  };
+
+  const groups = getCategoryGroups(cat.name);
+  const browseList = (() => {
+    if (mode !== "browseItems") return null;
+    if (browseGroup) {
+      const g = groups.get(browseGroup) ?? { flats: [], families: [] };
+      return {
+        title: browseGroup,
+        families: [...g.families].sort((a, b) => a.label.localeCompare(b.label)),
+        flats: [...g.flats].sort((a, b) => a.name.localeCompare(b.name)),
+        back: () => {
+          setBrowseGroup(null);
+          setMode("browseCats");
+        },
+      };
+    }
+    const all = getAllCategoryItems(cat.name);
+    return { title: `${cat.name} — browse`, ...all, back: null };
+  })();
+
+  const [browseFilter, setBrowseFilter] = useState("");
+
+  return (
+    <div className="no-print mt-2 flex items-center gap-2 border-t border-border/60 pt-3">
+      <input
+        type="number"
+        min={1}
+        value={qty}
+        onChange={(e) => setQty(parseInt(e.target.value) || 1)}
+        title="Quantity"
+        className="w-14 rounded-md border border-border bg-elevated px-2 py-2 text-center font-mono text-xs text-foreground focus:border-primary focus:outline-none"
+      />
+      <div className="relative flex-1">
+        <input
+          ref={inputRef}
+          value={q}
+          placeholder={`Type to add to ${cat.name}…`}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setSel(-1);
+            if (e.target.value.trim()) {
+              setBrowseGroup(null);
+              setFamily(null);
+              setMode("search");
+            } else if (mode === "search") {
+              setMode("closed");
+            }
+          }}
+          onKeyDown={(e) => {
+            if (mode === "picker" || mode === "browseCats" || mode === "browseItems") {
+              if (e.key === "Escape") {
+                e.preventDefault();
+                closeAll();
+              }
+              return;
+            }
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              if (results.length) setSel((s) => (s + 1) % results.length);
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              if (results.length)
+                setSel((s) => (s - 1 + results.length) % results.length);
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              const res = sel >= 0 ? results[sel] : undefined;
+              if (res) {
+                if (res.kind === "family") openPicker(res.family);
+                else addFlat(res.item.name, res.item.qty, res.item.group);
+              } else if (q.trim()) {
+                addFlat(q, qty);
+              }
+            } else if (e.key === "Escape") {
+              closeAll();
+            }
+          }}
+          onBlur={() => {
+            setTimeout(() => {
+              if (panelRef.current?.contains(document.activeElement)) return;
+              closeAll();
+            }, 150);
+          }}
+          className="w-full rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none"
+        />
+
+        {mode !== "closed" && (
+          <div ref={panelRef} className={panelCls}>
+            {mode === "search" &&
+              (results.length === 0 ? (
+                <p className="px-3 py-3 text-sm text-muted-foreground">
+                  No matches — press Enter to add it as a custom item.
+                </p>
+              ) : (
+                results.map((res, i) =>
+                  res.kind === "family" ? (
+                    <button
+                      key={`f${res.family.label}`}
+                      type="button"
+                      onMouseDown={(e) => {
+                        stop(e);
+                        openPicker(res.family);
+                      }}
+                      className={`${rowCls} ${i === sel ? "bg-accent" : ""}`}
+                    >
+                      <span>{res.family.label}</span>
+                      <span className={chevronCls}>
+                        {res.family.variants.length}{" "}
+                        {res.family.variants.length === 1 ? "option ›" : "options ›"}
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      key={`s${res.item.name}`}
+                      type="button"
+                      onMouseDown={(e) => {
+                        stop(e);
+                        addFlat(res.item.name, res.item.qty, res.item.group);
+                      }}
+                      className={`${rowCls} ${i === sel ? "bg-accent" : ""}`}
+                    >
+                      <span>
+                        {res.item.qty > 1 ? `${res.item.qty} × ` : ""}
+                        {res.item.name}
+                      </span>
+                    </button>
+                  ),
+                )
+              ))}
+
+            {mode === "browseCats" && (
+              <>
+                <div className="sticky top-0 border-b border-border bg-popover px-3 py-2">
+                  <span className="slate-label">{cat.name} — browse</span>
+                </div>
+                {[...groups.keys()]
+                  .sort((a, b) => a.localeCompare(b))
+                  .map((name) => {
+                    const g = groups.get(name)!;
+                    const count = g.flats.length + g.families.length;
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        onMouseDown={(e) => {
+                          stop(e);
+                          setBrowseFilter("");
+                          setBrowseGroup(name);
+                          setMode("browseItems");
+                        }}
+                        className={rowCls}
+                      >
+                        <span>{name}</span>
+                        <span className={chevronCls}>
+                          {count} {count === 1 ? "item ›" : "items ›"}
+                        </span>
+                      </button>
+                    );
+                  })}
+              </>
+            )}
+
+            {mode === "browseItems" && browseList && (
+              <>
+                <div className="sticky top-0 border-b border-border bg-popover px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    {browseList.back && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          stop(e);
+                          browseList.back?.();
+                        }}
+                        className="rounded border border-border px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        ←
+                      </button>
+                    )}
+                    <span className="slate-label">{browseList.title}</span>
+                  </div>
+                  {browseList.families.length + browseList.flats.length > 8 && (
+                    <input
+                      value={browseFilter}
+                      onChange={(e) => setBrowseFilter(e.target.value)}
+                      placeholder={`Filter ${browseList.title}…`}
+                      className="mt-2 w-full rounded-md border border-border bg-elevated px-2 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                    />
+                  )}
+                </div>
+                {(() => {
+                  const f = browseFilter.trim().toLowerCase();
+                  const fams = browseList.families.filter(
+                    (x) => !f || x.label.toLowerCase().includes(f),
+                  );
+                  const flats = browseList.flats.filter(
+                    (x) => !f || x.name.toLowerCase().includes(f),
+                  );
+                  if (fams.length + flats.length === 0)
+                    return (
+                      <p className="px-3 py-3 text-sm text-muted-foreground">
+                        No matches.
+                      </p>
+                    );
+                  return (
+                    <>
+                      {fams.map((x) => (
+                        <button
+                          key={`bf${x.label}`}
+                          type="button"
+                          onMouseDown={(e) => {
+                            stop(e);
+                            openPicker(x);
+                          }}
+                          className={rowCls}
+                        >
+                          <span>{x.label}</span>
+                          <span className={chevronCls}>
+                            {x.variants.length}{" "}
+                            {x.variants.length === 1 ? "option ›" : "options ›"}
+                          </span>
+                        </button>
+                      ))}
+                      {flats.map((x) => (
+                        <button
+                          key={`bs${x.name}`}
+                          type="button"
+                          onMouseDown={(e) => {
+                            stop(e);
+                            addFlat(x.name, x.qty, x.group);
+                          }}
+                          className={rowCls}
+                        >
+                          <span>
+                            {x.qty > 1 ? `${x.qty} × ` : ""}
+                            {x.name}
+                          </span>
+                        </button>
+                      ))}
+                    </>
+                  );
+                })()}
+              </>
+            )}
+
+            {mode === "picker" && family && (
+              <>
+                <div className="sticky top-0 border-b border-border bg-popover px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        stop(e);
+                        setFamily(null);
+                        setChecked(new Set());
+                        setWholeSet(false);
+                        setPickerFilter("");
+                        setMode(q.trim() ? "search" : "closed");
+                      }}
+                      className="rounded border border-border px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      ←
+                    </button>
+                    <span className="font-display text-xs uppercase tracking-[0.08em] text-foreground">
+                      {family.label}
+                    </span>
+                  </div>
+                  {family.info && (
+                    <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+                      {family.info}
+                    </p>
+                  )}
+                  {family.variants.length > 8 && (
+                    <input
+                      value={pickerFilter}
+                      onChange={(e) => setPickerFilter(e.target.value)}
+                      placeholder={`Filter ${family.label}…`}
+                      className="mt-2 w-full rounded-md border border-border bg-elevated px-2 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                    />
+                  )}
+                </div>
+
+                {family.wholeSetSpec && (
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      stop(e);
+                      setWholeSet((v) => !v);
+                    }}
+                    className={`${rowCls} border-b border-border/60`}
+                  >
+                    <span
+                      className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
+                        wholeSet
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border"
+                      }`}
+                    >
+                      {wholeSet ? "✓" : ""}
+                    </span>
+                    <span className="font-semibold">
+                      Whole Set —{" "}
+                      {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
+                    </span>
+                  </button>
+                )}
+
+                {family.variants.map((v, i) => {
+                  const f = pickerFilter.trim().toLowerCase();
+                  if (f && !v.toLowerCase().includes(f)) return null;
+                  const on = checked.has(i);
+                  return (
+                    <button
+                      key={v + i}
+                      type="button"
+                      onMouseDown={(e) => {
+                        stop(e);
+                        setChecked((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(i)) next.delete(i);
+                          else next.add(i);
+                          return next;
+                        });
+                      }}
+                      className={rowCls}
+                    >
+                      <span
+                        className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
+                          on
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border"
+                        }`}
+                      >
+                        {on ? "✓" : ""}
+                      </span>
+                      <span>{v}</span>
+                    </button>
+                  );
+                })}
+
+                <div className="sticky bottom-0 border-t border-border bg-popover p-2">
+                  {(() => {
+                    const n = checked.size + (wholeSet ? 1 : 0);
+                    return (
+                      <button
+                        type="button"
+                        disabled={n === 0}
+                        onMouseDown={(e) => {
+                          stop(e);
+                          commitPicker();
+                        }}
+                        className="w-full rounded-md bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                      >
+                        {n > 0 ? `Add ${n} selected` : "Select items to add"}
+                      </button>
+                    );
+                  })()}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      <button
+        type="button"
+        title={`Browse ${cat.name}`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          browseOpen();
+        }}
+        className="rounded-md border border-border bg-elevated px-2.5 py-2 font-mono text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+      >
+        ☰
+      </button>
+      <button
+        type="button"
+        onClick={() => q.trim() && addFlat(q, qty)}
+        className="rounded-md bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground transition-opacity hover:opacity-90"
+      >
+        + Add
+      </button>
+    </div>
+  );
+}
