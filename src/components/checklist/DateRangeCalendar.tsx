@@ -11,11 +11,15 @@ import {
 type Props = {
   project: Project;
   field: DateField;
-  onSwitchField: (f: DateField) => void;
-  onPickDay: (iso: string) => void;
-  onClear: () => void;
-  onClose: () => void;
+  onSwitchField?: (f: DateField) => void;
+  onPickDay?: (iso: string) => void;
+  onClear?: () => void;
+  onClose?: () => void;
+  /** View-only preview: no tabs, no day picking, no footer actions. */
+  readOnly?: boolean;
+  className?: string;
 };
+
 
 const FIELDS: DateField[] = ["prep", "dates", "returnDate"];
 
@@ -50,6 +54,8 @@ export function DateRangeCalendar({
   onPickDay,
   onClear,
   onClose,
+  readOnly = false,
+  className = "",
 }: Props) {
   const base = project[field].start ? parseIso(project[field].start) : new Date();
   const [viewY, setViewY] = useState(base.getFullYear());
@@ -105,8 +111,9 @@ export function DateRangeCalendar({
   return (
     <div
       data-date-cal
-      className="mt-3 rounded-lg border border-border bg-elevated p-3 shadow-lift"
+      className={`rounded-lg border border-border bg-elevated p-3 shadow-lift ${className || "mt-3"}`}
     >
+      {!readOnly && (
       <div className="mb-3 flex gap-1.5">
         {FIELDS.map((key) => (
           <button
@@ -114,7 +121,7 @@ export function DateRangeCalendar({
             type="button"
             onMouseDown={(e) => {
               stop(e);
-              onSwitchField(key);
+              onSwitchField?.(key);
             }}
             className={`flex flex-1 items-center justify-center gap-2 rounded-md border px-2 py-1.5 text-xs uppercase tracking-[0.12em] transition-colors ${
               field === key
@@ -130,6 +137,7 @@ export function DateRangeCalendar({
           </button>
         ))}
       </div>
+      )}
 
       <div className="mb-2 flex items-center justify-between">
         <button
@@ -184,10 +192,10 @@ export function DateRangeCalendar({
             <button
               key={i}
               type="button"
-              disabled={!c.iso}
+              disabled={!c.iso || readOnly}
               onMouseDown={(e) => {
                 stop(e);
-                if (c.iso) onPickDay(c.iso);
+                if (c.iso) onPickDay?.(c.iso);
               }}
               className={`h-8 rounded-md font-mono text-[13px] transition-colors ${
                 c.otherMonth ? "text-muted-foreground/35" : cls
@@ -199,12 +207,13 @@ export function DateRangeCalendar({
         })}
       </div>
 
+      {!readOnly && (
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <button
           type="button"
           onMouseDown={(e) => {
             stop(e);
-            onClear();
+            onClear?.();
           }}
           className="text-xs uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-destructive"
         >
@@ -214,13 +223,14 @@ export function DateRangeCalendar({
           type="button"
           onMouseDown={(e) => {
             stop(e);
-            onClose();
+            onClose?.();
           }}
           className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground"
         >
           Done
         </button>
       </div>
+      )}
     </div>
   );
 }

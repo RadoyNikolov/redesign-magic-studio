@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
-import { catColor, extractMm, uid } from "@/data/gear";
+import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import { useChecklist, type Item, type Status } from "@/lib/checklist-store";
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
@@ -133,21 +133,29 @@ function Index() {
     selectedIdx: number[],
     qty: number,
   ) => {
-    const newMm = selectedIdx.map((i) => extractMm(family.variants[i]));
-    let addedCount = 0;
+    // The picker opens with already-added focal lengths pre-checked, so whatever
+    // is checked now is the row's full intended content.
+    const newMm = selectedIdx
+      .map((i) => extractMm(family.variants[i]))
+      .sort((a: string, b: string) => mmSortKey(a) - mmSortKey(b));
+    let prevCount = 0;
+    let existed = false;
     mutate((d) => {
       const cat = d.categories.find((c) => c.id === catId);
       if (!cat) return;
-      const existing = cat.items.find((x) => x.familyKey === family.label);
-      if (existing) {
-        const merged = (existing.mmList ?? []).slice();
-        newMm.forEach((m) => {
-          if (!merged.includes(m)) merged.push(m);
-        });
-        addedCount = merged.length - (existing.mmList?.length ?? 0);
-        existing.mmList = merged;
-        existing.name = `${family.label} ${merged.join(", ")}`;
+      const idx = cat.items.findIndex((x) => x.familyKey === family.label);
+      const row = idx >= 0 ? cat.items[idx] : undefined;
+      existed = !!row;
+      prevCount = row ? (row.mmList?.length ?? 0) : 0;
+      if (newMm.length === 0) {
+        if (row) cat.items.splice(idx, 1);
+        return;
+      }
+      if (row) {
+        row.mmList = newMm;
+        row.name = `${family.label} ${newMm.join(", ")}`;
       } else {
+
         cat.items.push({
           id: uid(),
           name: `${family.label} ${newMm.join(", ")}`,
@@ -157,17 +165,22 @@ function Index() {
           familyKey: family.label,
           mmList: newMm,
         });
-        addedCount = newMm.length;
       }
     });
-    toast(
-      addedCount > 0
-        ? addedCount === 1
-          ? "Added 1 focal length"
-          : `Added ${addedCount} focal lengths`
-        : "Already in the list",
-    );
+    if (newMm.length === 0 && !existed) return;
+    const diff = newMm.length - prevCount;
+    if (newMm.length === 0) toast("Removed from list");
+    else if (diff > 0)
+      toast(diff === 1 ? "Added 1 focal length" : `Added ${diff} focal lengths`);
+    else if (diff < 0)
+      toast(
+        Math.abs(diff) === 1
+          ? "Removed 1 focal length"
+          : `Removed ${Math.abs(diff)} focal lengths`,
+      );
+    else toast("No changes");
   };
+
 
   const handlePrint = () => {
     const hadCollapsed =

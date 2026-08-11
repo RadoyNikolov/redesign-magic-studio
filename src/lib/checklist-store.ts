@@ -80,7 +80,7 @@ function defaultData(): State {
     categories: Object.keys(GEAR).map((name) => ({
       id: uid(),
       name,
-      collapsed: false,
+      collapsed: true,
       items: [],
     })),
   };
@@ -127,7 +127,7 @@ export function loadState(): State {
         const existingNames = new Set(d.categories.map((c: Category) => c.name));
         Object.keys(GEAR).forEach((name) => {
           if (!existingNames.has(name)) {
-            d.categories.push({ id: uid(), name, collapsed: false, items: [] });
+            d.categories.push({ id: uid(), name, collapsed: true, items: [] });
           }
         });
         d.categories = reorderCategoriesToCanonical(d.categories);

@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { FAMILIES, SUGGESTIONS } from "@/data/gear";
+import { FAMILIES, SUGGESTIONS, extractMm } from "@/data/gear";
 import type { Category } from "@/lib/checklist-store";
 
 type Family = {
@@ -59,7 +59,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
   const [sel, setSel] = useState(-1);
   const [family, setFamily] = useState<Family | null>(null);
   const [checked, setChecked] = useState<Set<number>>(new Set());
-  const [wholeSet, setWholeSet] = useState(false);
   const [pickerFilter, setPickerFilter] = useState("");
   const [browseGroup, setBrowseGroup] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,7 +80,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     setMode("closed");
     setFamily(null);
     setChecked(new Set());
-    setWholeSet(false);
     setPickerFilter("");
     setBrowseGroup(null);
     setSel(-1);
@@ -89,8 +87,16 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
 
   const openPicker = (f: Family) => {
     setFamily(f);
-    setChecked(new Set());
-    setWholeSet(false);
+    // Pre-check whichever focal lengths this family already contributes to the
+    // category, so the picker reflects the row's current content.
+    const existing = cat.items.find((x: any) => x.familyKey === f.label) as any;
+    const next = new Set<number>();
+    if (existing?.mmList) {
+      f.variants.forEach((v, i) => {
+        if (existing.mmList.includes(extractMm(v))) next.add(i);
+      });
+    }
+    setChecked(next);
     setPickerFilter("");
     setMode("picker");
   };
@@ -104,15 +110,17 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
 
   const commitPicker = () => {
     if (!family) return;
-    const selectedIdx = wholeSet
-      ? family.variants.map((_, i) => i)
-      : [...checked];
-    if (selectedIdx.length === 0) return;
-    onAddFamily(family, selectedIdx, Math.max(1, qty || 1));
+    const hadExisting = cat.items.some((x: any) => x.familyKey === family.label);
+    if (checked.size === 0 && !hadExisting) {
+      closeAll();
+      return;
+    }
+    onAddFamily(family, [...checked], Math.max(1, qty || 1));
     setQ("");
     closeAll();
     inputRef.current?.focus();
   };
+
 
   const stop = (e: React.MouseEvent) => e.preventDefault();
 
@@ -380,7 +388,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                         stop(e);
                         setFamily(null);
                         setChecked(new Set());
-                        setWholeSet(false);
                         setPickerFilter("");
                         setMode(q.trim() ? "search" : "closed");
                       }}
@@ -407,30 +414,40 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                   )}
                 </div>
 
-                {family.wholeSetSpec && (
-                  <button
-                    type="button"
-                    onMouseDown={(e) => {
-                      stop(e);
-                      setWholeSet((v) => !v);
-                    }}
-                    className={`${rowCls} border-b border-border/60`}
-                  >
-                    <span
-                      className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
-                        wholeSet
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border"
-                      }`}
+                {family.wholeSetSpec && (() => {
+                  const allOn =
+                    family.variants.length > 0 &&
+                    checked.size === family.variants.length;
+                  return (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        stop(e);
+                        setChecked(
+                          allOn
+                            ? new Set<number>()
+                            : new Set(family.variants.map((_, i) => i)),
+                        );
+                      }}
+                      className={`${rowCls} border-b border-border/60`}
                     >
-                      {wholeSet ? "✓" : ""}
-                    </span>
-                    <span className="font-semibold">
-                      Whole Set —{" "}
-                      {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
-                    </span>
-                  </button>
-                )}
+                      <span
+                        className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
+                          allOn
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border"
+                        }`}
+                      >
+                        {allOn ? "✓" : ""}
+                      </span>
+                      <span className="font-semibold">
+                        Whole Set —{" "}
+                        {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
+                      </span>
+                    </button>
+                  );
+                })()}
+
 
                 {family.variants.map((v, i) => {
                   const f = pickerFilter.trim().toLowerCase();
@@ -467,7 +484,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
 
                 <div className="sticky bottom-0 border-t border-border bg-popover p-2">
                   {(() => {
-                    const n = checked.size + (wholeSet ? 1 : 0);
+                    const n = checked.size;
                     return (
                       <button
                         type="button"
@@ -483,6 +500,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     );
                   })()}
                 </div>
+
               </>
             )}
           </div>

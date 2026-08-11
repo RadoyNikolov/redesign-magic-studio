@@ -1,5 +1,18 @@
-import type { Project } from "@/lib/checklist-store";
+import { useState } from "react";
+import type { DateField, Project } from "@/lib/checklist-store";
 import { formatDateRange } from "@/lib/dates";
+import { DateRangeCalendar } from "./DateRangeCalendar";
+
+const PILL_DOT: Record<DateField, string> = {
+  prep: "bg-prep",
+  dates: "bg-shoot",
+  returnDate: "bg-return",
+};
+const PILL_LABEL: Record<DateField, string> = {
+  prep: "Prep",
+  dates: "Shoot",
+  returnDate: "Return",
+};
 
 type Props = {
   project: Project;
@@ -8,6 +21,7 @@ type Props = {
 };
 
 export function ProjectCard({ project: p, onToggle, onEdit }: Props) {
+  const [roField, setRoField] = useState<DateField | null>(null);
   const shootText = formatDateRange(p.dates);
   const prepText = formatDateRange(p.prep);
   const returnText = formatDateRange(p.returnDate);
@@ -69,32 +83,52 @@ export function ProjectCard({ project: p, onToggle, onEdit }: Props) {
 
       {!p.collapsed && (
         <div className="border-t border-border px-4 py-4">
-          {shootText && (
-            <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-shoot/40 bg-shoot/10 px-3 py-1.5">
-              <span className="size-2 rounded-full bg-shoot" aria-hidden />
-              <span className="font-mono text-xs tracking-[0.06em] text-foreground">
-                {shootText}
-              </span>
-            </div>
-          )}
-
-          {(prepText || returnText) && (
-            <div className="mb-3 flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs">
-              {prepText && (
-                <span className="text-foreground">
-                  <span className="mr-2 uppercase tracking-[0.14em] text-prep">
-                    Prep
-                  </span>
-                  {prepText}
-                </span>
-              )}
-              {returnText && (
-                <span className="text-foreground">
-                  <span className="mr-2 uppercase tracking-[0.14em] text-return">
-                    Return
-                  </span>
-                  {returnText}
-                </span>
+          {(prepText || shootText || returnText) && (
+            <div className="relative mb-3">
+              <div className="flex flex-wrap gap-2" title="Tap a date to view it on a calendar">
+                {(
+                  [
+                    ["prep", prepText],
+                    ["dates", shootText],
+                    ["returnDate", returnText],
+                  ] as [DateField, string][]
+                )
+                  .filter(([, text]) => !!text)
+                  .map(([key, text]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() =>
+                        setRoField((cur) => (cur === key ? null : key))
+                      }
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 transition-colors ${
+                        roField === key
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-elevated hover:border-primary/60"
+                      }`}
+                    >
+                      <span
+                        className={`size-2 rounded-full ${PILL_DOT[key]}`}
+                        aria-hidden
+                      />
+                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                        {PILL_LABEL[key]}
+                      </span>
+                      <span className="font-mono text-xs text-foreground">
+                        {text}
+                      </span>
+                    </button>
+                  ))}
+              </div>
+              {roField && (
+                <div className="no-print absolute left-0 top-[calc(100%+6px)] z-30 w-[320px] max-w-full">
+                  <DateRangeCalendar
+                    project={p}
+                    field={roField}
+                    readOnly
+                    className="m-0"
+                  />
+                </div>
               )}
             </div>
           )}
