@@ -1358,6 +1358,44 @@ const ZOOM_LENS_FAMILIES = [
 ];
 ZOOM_LENS_FAMILIES.forEach(([name, mount, info, lenses]) => addLensFamily(name, mount, info, lenses, "Zooms"));
 
+/* ---------- Prime/Zoom classification fixes (post-audit) ---------- */
+[
+  "Cooke Varotal/i FF Zoom","DZOFilm Pictor Zoom","DZOFilm Tango Zoom",
+  "DZOFilm Catta Zoom","DZOFilm Catta Ace","ARRI Signature Zoom"
+].forEach(label=>{
+  const f = FAMILIES.find(x=>x.cat==="Lenses" && x.label===label);
+  if(f) f.group = "Zooms";
+});
+
+// Superseded by more complete zoom families added later — drop the older ones.
+["ARRI Fujinon Alura Zoom","Angenieux Type EZ","Canon CN-E Flex Zoom"].forEach(label=>{
+  const idx = FAMILIES.findIndex(x=>x.cat==="Lenses" && x.label===label);
+  if(idx>=0) FAMILIES.splice(idx,1);
+});
+
+{
+  const f = FAMILIES.find(x=>x.cat==="Lenses" && x.label==="P+S Technik Technovision 1.5x");
+  if(f) f.variants = f.variants.filter(v => v !== "40-70mm T3.2 Zoom");
+}
+
+{
+  const f = FAMILIES.find(x=>x.cat==="Lenses" && x.label==="Angenieux Optimo Anamorphic");
+  if(f){ f.variants = f.variants.filter(v => v !== "44-440mm A2S T4.5"); f.group = "Zooms"; }
+}
+
+{
+  const f = FAMILIES.find(x=>x.cat==="Lenses" && x.label==="Canon CN-E Zoom");
+  if(f) f.variants.push("45-135mm T2.4", "70-200mm T2.8");
+}
+
+// Numeric sort key for "33mm" / "15-40mm" tokens.
+function mmSortKey(m){
+  const n = parseFloat(m);
+  return isNaN(n) ? Infinity : n;
+}
+
+
+
 /* ---------- Mattebox families ----------
    No "whole set" bundle — you pick one configuration, so only variants
    are offered in the picker. */
@@ -1446,4 +1484,5 @@ export {
   wholeSetName,
   variantName,
   extractMm,
+  mmSortKey,
 };
