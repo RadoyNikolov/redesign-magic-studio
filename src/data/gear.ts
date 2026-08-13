@@ -78,7 +78,7 @@ export type Suggestion = {
 /* ---------- Cameras, split into two groups shown as sub-headers ----------
    "group" tags let the Cameras category render Digital and Film as visually
    separate sections while staying one category underneath. */
-const DIGITAL_CAMERAS = [
+const DIGITAL_CAMERAS: [string, number][] = [
   ["Sony CineAlta Venice · PL Mount", 1],
   ["Sony CineAlta Venice 2 6K · PL Mount", 1],
   ["Sony CineAlta Venice 2 8K · PL Mount", 1],
@@ -132,7 +132,7 @@ const DIGITAL_CAMERAS = [
   ["Canon EOS C300 Mark III · EF Mount", 1],
   ["Canon EOS R5 C · RF Mount", 1],
 ];
-const FILM_CAMERAS = [
+const FILM_CAMERAS: [string, number][] = [
   ["Aaton LTR · 16mm", 1],
   ["Aaton XTR Prod · 16mm", 1],
   ["Aaton Xtera · Super 16", 1],
@@ -176,7 +176,7 @@ const FILM_CAMERAS = [
 
 /* ---------- Gear knowledge base (from your Camlist project lists) ----------
    Used only for typing suggestions — categories start empty. */
-const GEAR = {
+const GEAR: Record<string, [string, number, string?][]> = {
   Cameras: DIGITAL_CAMERAS.map(([n, q]) => [n, q, "Digital Camera"]).concat(
     FILM_CAMERAS.map(([n, q]) => [n, q, "Film Camera"]),
   ),
