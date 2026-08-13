@@ -54,17 +54,26 @@ const CATEGORY_PALETTE = [
   "#D1603B",
   "#74564A",
 ];
-function catColor(index, name) {
-  if (name && CATEGORY_COLOR_MAP[name]) return CATEGORY_COLOR_MAP[name];
+function catColor(index: number, name: string) {
+  if (name && CATEGORY_COLOR_MAP[name as keyof typeof CATEGORY_COLOR_MAP]) return CATEGORY_COLOR_MAP[name as keyof typeof CATEGORY_COLOR_MAP];
   return CATEGORY_PALETTE[index % CATEGORY_PALETTE.length];
 }
 
-// Preferred display order for item sub-groups (e.g. "Digital Camera" before
-// "Film Camera" within Cameras). Shared by render()'s grouped item headers
-// and the browse-by-category picker. Unknown group names sort alphabetically
-// after all known ones.
-// (Sub-group display order is now purely alphabetical — see localeCompare
-// usage in render() and orderedGroupNames() below.)
+export type Family = {
+  cat: string;
+  label: string;
+  info: string | null;
+  wholeSetSpec: string | null;
+  variants: string[];
+  group?: string | null;
+};
+
+export type Suggestion = {
+  name: string;
+  qty: number;
+  cat: string;
+  group: string | null;
+};
 
 /* ---------- Cameras, split into two groups shown as sub-headers ----------
    "group" tags let the Cameras category render Digital and Film as visually
