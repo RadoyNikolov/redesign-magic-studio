@@ -1,8 +1,5 @@
-// @ts-nocheck
-/* eslint-disable */
 // Data + family model ported verbatim from the original standalone checklist app.
 // Ported verbatim from the original standalone checklist app.
-/* eslint-disable */
 const STORAGE_KEY = "cameraGearChecklist_v2";
 let uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
