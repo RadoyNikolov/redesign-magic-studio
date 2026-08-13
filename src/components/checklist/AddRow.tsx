@@ -86,7 +86,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     const next = new Set<number>();
     if (existing?.mmList) {
       f.variants.forEach((v, i) => {
-        if (existing.mmList.includes(extractMm(v))) next.add(i);
+        if (existing.mmList?.includes(extractMm(v))) next.add(i);
       });
     }
     setChecked(next);

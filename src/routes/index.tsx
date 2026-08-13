@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
 import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
+import type { Family } from "@/data/gear";
 import { useChecklist, type Item, type Status } from "@/lib/checklist-store";
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
