@@ -25,11 +25,8 @@ export function ProjectCard({ project: p, onToggle, onEdit }: Props) {
   const shootText = formatDateRange(p.dates);
   const prepText = formatDateRange(p.prep);
   const returnText = formatDateRange(p.returnDate);
-  const filledContacts = p.contacts.filter(
-    (c) => c.role || c.name || c.email || c.phone,
-  );
-  const empty =
-    !shootText && !prepText && !returnText && filledContacts.length === 0;
+  const filledContacts = p.contacts.filter((c) => c.role || c.name || c.email || c.phone);
+  const empty = !shootText && !prepText && !returnText && filledContacts.length === 0;
 
   return (
     <section className="overflow-hidden rounded-xl border border-border bg-card shadow-panel">
@@ -98,36 +95,24 @@ export function ProjectCard({ project: p, onToggle, onEdit }: Props) {
                     <button
                       key={key}
                       type="button"
-                      onClick={() =>
-                        setRoField((cur) => (cur === key ? null : key))
-                      }
+                      onClick={() => setRoField((cur) => (cur === key ? null : key))}
                       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 transition-colors ${
                         roField === key
                           ? "border-primary bg-primary/10"
                           : "border-border bg-elevated hover:border-primary/60"
                       }`}
                     >
-                      <span
-                        className={`size-2 rounded-full ${PILL_DOT[key]}`}
-                        aria-hidden
-                      />
+                      <span className={`size-2 rounded-full ${PILL_DOT[key]}`} aria-hidden />
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                         {PILL_LABEL[key]}
                       </span>
-                      <span className="font-mono text-xs text-foreground">
-                        {text}
-                      </span>
+                      <span className="font-mono text-xs text-foreground">{text}</span>
                     </button>
                   ))}
               </div>
               {roField && (
                 <div className="no-print absolute left-0 top-[calc(100%+6px)] z-30 w-[320px] max-w-full">
-                  <DateRangeCalendar
-                    project={p}
-                    field={roField}
-                    readOnly
-                    className="m-0"
-                  />
+                  <DateRangeCalendar project={p} field={roField} readOnly className="m-0" />
                 </div>
               )}
             </div>
@@ -145,9 +130,7 @@ export function ProjectCard({ project: p, onToggle, onEdit }: Props) {
                   </span>
                   <span className="text-foreground">{c.name}</span>
                   <span className="text-muted-foreground">{c.email}</span>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {c.phone}
-                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">{c.phone}</span>
                 </div>
               ))}
             </div>

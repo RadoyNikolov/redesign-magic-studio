@@ -73,9 +73,7 @@ export function CategoryCard({
         >
           −
         </button>
-        <span className="w-9 text-center font-mono text-xs text-foreground">
-          {it.qty} ×
-        </span>
+        <span className="w-9 text-center font-mono text-xs text-foreground">{it.qty} ×</span>
         <button
           type="button"
           title="Increase quantity"
@@ -85,12 +83,8 @@ export function CategoryCard({
           +
         </button>
       </span>
-      <span className="hidden shrink-0 font-mono text-xs print:inline">
-        {it.qty} ×
-      </span>
-      <span className="min-w-0 flex-1 text-sm leading-snug text-foreground">
-        {it.name}
-      </span>
+      <span className="hidden shrink-0 font-mono text-xs print:inline">{it.qty} ×</span>
+      <span className="min-w-0 flex-1 text-sm leading-snug text-foreground">{it.name}</span>
       <span className="no-print flex shrink-0 gap-1">
         {STATUS_META.map((s) => (
           <button
@@ -193,21 +187,13 @@ export function CategoryCard({
 
           {groupNames.map((g) => (
             <div key={g}>
-              <p className="slate-label mt-3 border-b border-border/60 pb-1">
-                {g}
-              </p>
-              <div className="divide-y divide-border/40">
-                {grouped.get(g)!.map(renderItem)}
-              </div>
+              <p className="slate-label mt-3 border-b border-border/60 pb-1">{g}</p>
+              <div className="divide-y divide-border/40">{grouped.get(g)!.map(renderItem)}</div>
             </div>
           ))}
-          <div className="divide-y divide-border/40">
-            {ungrouped.map(renderItem)}
-          </div>
+          <div className="divide-y divide-border/40">{ungrouped.map(renderItem)}</div>
 
-          {showAddRow && (
-            <AddRow cat={cat} onAdd={onAdd} onAddFamily={onAddFamily} />
-          )}
+          {showAddRow && <AddRow cat={cat} onAdd={onAdd} onAddFamily={onAddFamily} />}
         </div>
       )}
     </section>

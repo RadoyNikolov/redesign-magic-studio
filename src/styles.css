@@ -138,11 +138,7 @@
 }
 
 @utility hairline-grid {
-  background-image: linear-gradient(
-    to right,
-    oklch(1 0 0 / 3%) 1px,
-    transparent 1px
-  );
+  background-image: linear-gradient(to right, oklch(1 0 0 / 3%) 1px, transparent 1px);
   background-size: 4px 100%;
 }
 

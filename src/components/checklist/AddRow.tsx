@@ -121,7 +121,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     inputRef.current?.focus();
   };
 
-
   const stop = (e: React.MouseEvent) => e.preventDefault();
 
   const browseOpen = () => {
@@ -196,8 +195,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
               if (results.length) setSel((s) => (s + 1) % results.length);
             } else if (e.key === "ArrowUp") {
               e.preventDefault();
-              if (results.length)
-                setSel((s) => (s - 1 + results.length) % results.length);
+              if (results.length) setSel((s) => (s - 1 + results.length) % results.length);
             } else if (e.key === "Enter") {
               e.preventDefault();
               const res = sel >= 0 ? results[sel] : undefined;
@@ -332,11 +330,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     (x) => !f || x.name.toLowerCase().includes(f),
                   );
                   if (fams.length + flats.length === 0)
-                    return (
-                      <p className="px-3 py-3 text-sm text-muted-foreground">
-                        No matches.
-                      </p>
-                    );
+                    return <p className="px-3 py-3 text-sm text-muted-foreground">No matches.</p>;
                   return (
                     <>
                       {fams.map((x) => (
@@ -351,8 +345,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                         >
                           <span>{x.label}</span>
                           <span className={chevronCls}>
-                            {x.variants.length}{" "}
-                            {x.variants.length === 1 ? "option ›" : "options ›"}
+                            {x.variants.length} {x.variants.length === 1 ? "option ›" : "options ›"}
                           </span>
                         </button>
                       ))}
@@ -414,40 +407,36 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                   )}
                 </div>
 
-                {family.wholeSetSpec && (() => {
-                  const allOn =
-                    family.variants.length > 0 &&
-                    checked.size === family.variants.length;
-                  return (
-                    <button
-                      type="button"
-                      onMouseDown={(e) => {
-                        stop(e);
-                        setChecked(
-                          allOn
-                            ? new Set<number>()
-                            : new Set(family.variants.map((_, i) => i)),
-                        );
-                      }}
-                      className={`${rowCls} border-b border-border/60`}
-                    >
-                      <span
-                        className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
-                          allOn
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border"
-                        }`}
+                {family.wholeSetSpec &&
+                  (() => {
+                    const allOn =
+                      family.variants.length > 0 && checked.size === family.variants.length;
+                    return (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          stop(e);
+                          setChecked(
+                            allOn ? new Set<number>() : new Set(family.variants.map((_, i) => i)),
+                          );
+                        }}
+                        className={`${rowCls} border-b border-border/60`}
                       >
-                        {allOn ? "✓" : ""}
-                      </span>
-                      <span className="font-semibold">
-                        Whole Set —{" "}
-                        {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
-                      </span>
-                    </button>
-                  );
-                })()}
-
+                        <span
+                          className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
+                            allOn
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border"
+                          }`}
+                        >
+                          {allOn ? "✓" : ""}
+                        </span>
+                        <span className="font-semibold">
+                          Whole Set — {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
+                        </span>
+                      </button>
+                    );
+                  })()}
 
                 {family.variants.map((v, i) => {
                   const f = pickerFilter.trim().toLowerCase();
@@ -470,9 +459,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     >
                       <span
                         className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
-                          on
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border"
+                          on ? "border-primary bg-primary text-primary-foreground" : "border-border"
                         }`}
                       >
                         {on ? "✓" : ""}
@@ -500,7 +487,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     );
                   })()}
                 </div>
-
               </>
             )}
           </div>

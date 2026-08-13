@@ -114,9 +114,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
             const text = formatDateRange(p[key]);
             return (
               <div key={key}>
-                <span className="slate-label mb-1.5 block">
-                  {FIELD_TITLE[key]}
-                </span>
+                <span className="slate-label mb-1.5 block">{FIELD_TITLE[key]}</span>
                 <button
                   type="button"
                   data-date-btn
@@ -228,9 +226,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                 title="Remove position"
                 onClick={() =>
                   mutate((d) => {
-                    d.project.contacts = d.project.contacts.filter(
-                      (x) => x.id !== c.id,
-                    );
+                    d.project.contacts = d.project.contacts.filter((x) => x.id !== c.id);
                   })
                 }
                 className="justify-self-end rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"

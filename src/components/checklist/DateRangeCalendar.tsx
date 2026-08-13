@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 import type { DateField, DateRange, Project } from "@/lib/checklist-store";
-import {
-  DOW_NAMES,
-  MONTH_NAMES,
-  fieldLabel,
-  isoDate,
-  parseIso,
-} from "@/lib/dates";
+import { DOW_NAMES, MONTH_NAMES, fieldLabel, isoDate, parseIso } from "@/lib/dates";
 
 type Props = {
   project: Project;
@@ -19,7 +13,6 @@ type Props = {
   readOnly?: boolean;
   className?: string;
 };
-
 
 const FIELDS: DateField[] = ["prep", "dates", "returnDate"];
 
@@ -85,8 +78,7 @@ export function DateRangeCalendar({
   for (let d = 1; d <= daysInMonth; d++)
     cells.push({ dayNum: d, otherMonth: false, iso: isoDate(viewY, viewM, d) });
   let nextNum = 1;
-  while (cells.length < 42)
-    cells.push({ dayNum: nextNum++, otherMonth: true, iso: null });
+  while (cells.length < 42) cells.push({ dayNum: nextNum++, otherMonth: true, iso: null });
 
   const stepMonth = (delta: number) => {
     let m = viewM + delta;
@@ -114,29 +106,26 @@ export function DateRangeCalendar({
       className={`rounded-lg border border-border bg-elevated p-3 shadow-lift ${className || "mt-3"}`}
     >
       {!readOnly && (
-      <div className="mb-3 flex gap-1.5">
-        {FIELDS.map((key) => (
-          <button
-            key={key}
-            type="button"
-            onMouseDown={(e) => {
-              stop(e);
-              onSwitchField?.(key);
-            }}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-md border px-2 py-1.5 text-xs uppercase tracking-[0.12em] transition-colors ${
-              field === key
-                ? "border-primary bg-primary/15 text-foreground"
-                : "border-border bg-card text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <span
-              className={`size-2 rounded-full ${RANGE_STYLES[key].dot}`}
-              aria-hidden
-            />
-            {fieldLabel(key)}
-          </button>
-        ))}
-      </div>
+        <div className="mb-3 flex gap-1.5">
+          {FIELDS.map((key) => (
+            <button
+              key={key}
+              type="button"
+              onMouseDown={(e) => {
+                stop(e);
+                onSwitchField?.(key);
+              }}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-md border px-2 py-1.5 text-xs uppercase tracking-[0.12em] transition-colors ${
+                field === key
+                  ? "border-primary bg-primary/15 text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className={`size-2 rounded-full ${RANGE_STYLES[key].dot}`} aria-hidden />
+              {fieldLabel(key)}
+            </button>
+          ))}
+        </div>
       )}
 
       <div className="mb-2 flex items-center justify-between">
@@ -169,11 +158,7 @@ export function DateRangeCalendar({
 
       <div className="grid grid-cols-7 gap-1">
         {DOW_NAMES.map((d) => (
-          <div
-            key={d}
-            className="slate-label pb-1 text-center"
-            style={{ letterSpacing: "0.1em" }}
-          >
+          <div key={d} className="slate-label pb-1 text-center" style={{ letterSpacing: "0.1em" }}>
             {d}
           </div>
         ))}
@@ -208,28 +193,28 @@ export function DateRangeCalendar({
       </div>
 
       {!readOnly && (
-      <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-        <button
-          type="button"
-          onMouseDown={(e) => {
-            stop(e);
-            onClear?.();
-          }}
-          className="text-xs uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-destructive"
-        >
-          Clear {fieldLabel(field)}
-        </button>
-        <button
-          type="button"
-          onMouseDown={(e) => {
-            stop(e);
-            onClose?.();
-          }}
-          className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground"
-        >
-          Done
-        </button>
-      </div>
+        <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              stop(e);
+              onClear?.();
+            }}
+            className="text-xs uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-destructive"
+          >
+            Clear {fieldLabel(field)}
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              stop(e);
+              onClose?.();
+            }}
+            className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground"
+          >
+            Done
+          </button>
+        </div>
       )}
     </div>
   );
