@@ -976,7 +976,7 @@ function extractMm(v: string) {
 /* ---------- Filter families ----------
    Each family offers a "Whole Set" bundle + individual strengths, so typing
    e.g. "Classic Soft" offers both in the picker. */
-const FILTER_FAMILIES = [
+const FILTER_FAMILIES: [string, string[], string?][] = [
   // [family name, grades, optional custom set label]
   ['Tiffen ND 4x5.65"', ["0.3", "0.6", "0.9", "1.2", "1.5", "1.8", "2.1"]],
   ['Tiffen IRND 4x5.65"', ["0.3", "0.6", "0.9", "1.2", "1.5", "1.8", "2.1"]],
@@ -1012,7 +1012,7 @@ FILTER_FAMILIES.forEach(([name, grades, setLabel]) => addFilterFamily(name, grad
    marked ≈ are approximate — verify against the barrel. Newer brand additions
    below use a simpler "focal length + T-stop" format since CF/Ø data isn't
    consistently published for all of them. */
-const LENS_FAMILIES = [
+const LENS_FAMILIES: [string, string, string, string[]][] = [
   // [name, mount, set info, [individual lenses with specs]]
   [
     "ARRI Master Prime",
@@ -1400,7 +1400,7 @@ LENS_FAMILIES.forEach(([name, mount, info, lenses]) =>
 /* ---------- New lens brands (added on request) ----------
    Simpler "focal length + T-stop" format — CF/Ø data isn't consistently
    published for all of these, so it's left out rather than guessed. */
-const NEW_LENS_FAMILIES = [
+const NEW_LENS_FAMILIES: [string, string, string, string[]][] = [
   [
     "7Artisans Vision",
     "various mirrorless",
@@ -1848,7 +1848,7 @@ NEW_LENS_FAMILIES.forEach(([name, mount, info, lenses]) =>
    Compiled from a full "Zooms" catalog screenshot set. Format strings kept
    exactly as shown: focal range, T-stop/aperture, squeeze factor (ANA) and
    sensor coverage (S16/S35/FF/65 or 2/3"). */
-const ZOOM_LENS_FAMILIES = [
+const ZOOM_LENS_FAMILIES: [string, string, string, string[]][] = [
   ["7Artisans Sprite", "various mirrorless", "S35 zoom", ["24-96mm T2.9 S35"]],
   [
     "Angenieux Optimo",
@@ -2229,7 +2229,7 @@ function mmSortKey(m: string) {
 /* ---------- Mattebox families ----------
    No "whole set" bundle — you pick one configuration, so only variants
    are offered in the picker. */
-const MATTEBOX_FAMILIES = [
+const MATTEBOX_FAMILIES: [string, string, string[]][] = [
   [
     "ARRI LMB 4x5",
     '4x4 / 4x5.65" · lenses Ø62–165mm',
@@ -2263,7 +2263,7 @@ MATTEBOX_FAMILIES.forEach(([name, info, variants]) => addMatteboxFamily(name, in
 
 /* ---------- Teradek wireless video families ----------
    No "whole set" bundle — each range/config is its own pickable item. */
-const TERADEK_FAMILIES = [
+const TERADEK_FAMILIES: [string, string, string[]][] = [
   [
     "Teradek Bolt 6 XT",
     "12G-SDI · 4K60 · 5/6GHz",
@@ -2319,7 +2319,7 @@ TERADEK_FAMILIES.forEach(([name, info, variants]) => addTeradekFamily(name, info
 
 /* ---------- Monitor families by BRAND ----------
    No "whole set" bundle — just brand → pick the models you have. */
-const MONITOR_FAMILIES = [
+const MONITOR_FAMILIES: [string, string[]][] = [
   [
     "SmallHD",
     [
