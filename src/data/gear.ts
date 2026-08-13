@@ -933,14 +933,14 @@ const SUGGESTIONS = Object.entries(GEAR).flatMap(([cat, items]) =>
      Teradek/monitors — you pick a specific configuration, not "everything")
    - variants: the individual pickable items (combined as "label + variant") */
 const FAMILIES: Family[] = [];
-function addLensFamily(label: string, mount: string, info: string, variants: string[], group?: string) {
+function addLensFamily(label: string, mount: string, info: string, variants: string[], group?: string | null) {
   FAMILIES.push({
     cat: "Lenses",
     label,
     info: mount,
     wholeSetSpec: "Set · " + mount + " (" + info + ")",
     variants,
-    group,
+    group: group ?? null,
   });
 }
 function addFilterFamily(label: string, grades: string[], setLabelOverride?: string | null) {
