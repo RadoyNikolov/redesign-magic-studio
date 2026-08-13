@@ -1,7 +1,7 @@
 // Data + family model ported verbatim from the original standalone checklist app.
 // Ported verbatim from the original standalone checklist app.
 const STORAGE_KEY = "cameraGearChecklist_v2";
-let uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 /* ---------- Category colors ----------
    Sampled directly from the user's own Catalog app (pixel-picked from their
@@ -2418,17 +2418,14 @@ const MONITOR_FAMILIES: [string, string[]][] = [
 ];
 MONITOR_FAMILIES.forEach(([brand, models]) => addMonitorFamily(brand, models));
 
-const FAMILIES_TYPED: any[] = FAMILIES;
-const SUGGESTIONS_TYPED: any[] = SUGGESTIONS;
-const PALETTE_TYPED: string[] = CATEGORY_PALETTE;
 export {
   uid,
   CATEGORY_COLOR_MAP,
-  PALETTE_TYPED as CATEGORY_PALETTE,
+  CATEGORY_PALETTE,
   catColor,
   GEAR,
-  SUGGESTIONS_TYPED as SUGGESTIONS,
-  FAMILIES_TYPED as FAMILIES,
+  SUGGESTIONS,
+  FAMILIES,
   wholeSetName,
   variantName,
   extractMm,

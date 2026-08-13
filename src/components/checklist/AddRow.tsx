@@ -1,15 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { FAMILIES, SUGGESTIONS, extractMm } from "@/data/gear";
-import type { Category } from "@/lib/checklist-store";
+import type { Family } from "@/data/gear";
+import type { Category, Item } from "@/lib/checklist-store";
 
-type Family = {
-  cat: string;
-  label: string;
-  info: string | null;
-  wholeSetSpec: string | null;
-  variants: string[];
-  group?: string | null;
-};
 type Flat = { name: string; qty: number; cat: string; group: string | null };
 
 type Props = {
@@ -22,12 +15,12 @@ type Mode = "closed" | "search" | "browseCats" | "browseItems" | "picker";
 
 function getCategoryGroups(catName: string) {
   const groups = new Map<string, { flats: Flat[]; families: Family[] }>();
-  (SUGGESTIONS as Flat[]).forEach((s) => {
+  SUGGESTIONS.forEach((s) => {
     if (s.cat !== catName || !s.group) return;
     if (!groups.has(s.group)) groups.set(s.group, { flats: [], families: [] });
     groups.get(s.group)!.flats.push(s);
   });
-  (FAMILIES as Family[]).forEach((f) => {
+  FAMILIES.forEach((f) => {
     if (f.cat !== catName || !f.group) return;
     if (!groups.has(f.group)) groups.set(f.group, { flats: [], families: [] });
     groups.get(f.group)!.families.push(f);
@@ -36,12 +29,12 @@ function getCategoryGroups(catName: string) {
 }
 
 function getAllCategoryItems(catName: string) {
-  const families = (FAMILIES as Family[])
-    .filter((f) => f.cat === catName)
-    .sort((a, b) => a.label.localeCompare(b.label));
-  const flats = (SUGGESTIONS as Flat[])
-    .filter((s) => s.cat === catName)
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const families = FAMILIES.filter((f) => f.cat === catName).sort((a, b) =>
+    a.label.localeCompare(b.label),
+  );
+  const flats = SUGGESTIONS.filter((s) => s.cat === catName).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   return { families, flats };
 }
 
