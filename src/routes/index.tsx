@@ -125,8 +125,8 @@ function Index() {
     // The picker opens with already-added focal lengths pre-checked, so whatever
     // is checked now is the row's full intended content.
     const newMm = selectedIdx
-      .map((i) => extractMm(family.variants[i]))
-      .sort((a: string, b: string) => mmSortKey(a) - mmSortKey(b));
+      .map((i) => extractMm(family.variants[i]!))
+      .sort((a, b) => mmSortKey(a) - mmSortKey(b));
     let prevCount = 0;
     let existed = false;
     mutate((d) => {
