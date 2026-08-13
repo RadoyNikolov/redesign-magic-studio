@@ -2221,7 +2221,7 @@ ZOOM_LENS_FAMILIES.forEach(([name, mount, info, lenses]) =>
 }
 
 // Numeric sort key for "33mm" / "15-40mm" tokens.
-function mmSortKey(m) {
+function mmSortKey(m: string) {
   const n = parseFloat(m);
   return isNaN(n) ? Infinity : n;
 }
