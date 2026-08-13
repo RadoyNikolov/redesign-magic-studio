@@ -82,7 +82,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     setFamily(f);
     // Pre-check whichever focal lengths this family already contributes to the
     // category, so the picker reflects the row's current content.
-    const existing = cat.items.find((x: any) => x.familyKey === f.label) as any;
+    const existing = cat.items.find((x) => x.familyKey === f.label);
     const next = new Set<number>();
     if (existing?.mmList) {
       f.variants.forEach((v, i) => {
@@ -103,7 +103,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
 
   const commitPicker = () => {
     if (!family) return;
-    const hadExisting = cat.items.some((x: any) => x.familyKey === family.label);
+    const hadExisting = cat.items.some((x) => x.familyKey === family.label);
     if (checked.size === 0 && !hadExisting) {
       closeAll();
       return;

@@ -120,7 +120,7 @@ function Index() {
     if (message) toast(message);
   };
 
-  const addFamily = (catId: string, family: any, selectedIdx: number[], qty: number) => {
+  const addFamily = (catId: string, family: Family, selectedIdx: number[], qty: number) => {
     // The picker opens with already-added focal lengths pre-checked, so whatever
     // is checked now is the row's full intended content.
     const newMm = selectedIdx

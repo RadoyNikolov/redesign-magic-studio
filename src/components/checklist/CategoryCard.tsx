@@ -1,4 +1,5 @@
 import type { Category, Item, Status } from "@/lib/checklist-store";
+import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
 
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onRemoveItem: (itemId: string) => void;
   onAdd: (name: string, qty: number, group?: string | null) => void;
-  onAddFamily: (family: any, selectedIdx: number[], qty: number) => void;
+  onAddFamily: (family: Family, selectedIdx: number[], qty: number) => void;
 };
 
 const STATUS_META = [
