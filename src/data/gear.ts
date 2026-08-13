@@ -56,7 +56,7 @@ const CATEGORY_PALETTE = [
 ];
 function catColor(index: number, name: string): string {
   if (name && name in CATEGORY_COLOR_MAP) {
-    return CATEGORY_COLOR_MAP[name as keyof typeof CATEGORY_COLOR_MAP];
+    return CATEGORY_COLOR_MAP[name as keyof typeof CATEGORY_COLOR_MAP] as string;
   }
   return CATEGORY_PALETTE[index % CATEGORY_PALETTE.length];
 }
