@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
 import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
+import type { Family } from "@/data/gear";
 import { useChecklist, type Item, type Status } from "@/lib/checklist-store";
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
@@ -96,21 +97,14 @@ function Index() {
     toast("Category added");
   };
 
-  const addItem = (
-    catId: string,
-    name: string,
-    qty: number,
-    group?: string | null,
-  ) => {
+  const addItem = (catId: string, name: string, qty: number, group?: string | null) => {
     const clean = name.trim();
     if (!clean) return;
     let message = "";
     mutate((d) => {
       const cat = d.categories.find((c) => c.id === catId);
       if (!cat) return;
-      const existing = cat.items.find(
-        (x) => x.name.toLowerCase() === clean.toLowerCase(),
-      );
+      const existing = cat.items.find((x) => x.name.toLowerCase() === clean.toLowerCase());
       if (existing) {
         existing.qty += Math.max(1, qty || 1);
         message = `Quantity increased to ${existing.qty} ×`;
@@ -127,17 +121,12 @@ function Index() {
     if (message) toast(message);
   };
 
-  const addFamily = (
-    catId: string,
-    family: any,
-    selectedIdx: number[],
-    qty: number,
-  ) => {
+  const addFamily = (catId: string, family: Family, selectedIdx: number[], qty: number) => {
     // The picker opens with already-added focal lengths pre-checked, so whatever
     // is checked now is the row's full intended content.
     const newMm = selectedIdx
-      .map((i) => extractMm(family.variants[i]))
-      .sort((a: string, b: string) => mmSortKey(a) - mmSortKey(b));
+      .map((i) => extractMm(family.variants[i]!))
+      .sort((a, b) => mmSortKey(a) - mmSortKey(b));
     let prevCount = 0;
     let existed = false;
     mutate((d) => {
@@ -155,7 +144,6 @@ function Index() {
         row.mmList = newMm;
         row.name = `${family.label} ${newMm.join(", ")}`;
       } else {
-
         cat.items.push({
           id: uid(),
           name: `${family.label} ${newMm.join(", ")}`,
@@ -170,25 +158,18 @@ function Index() {
     if (newMm.length === 0 && !existed) return;
     const diff = newMm.length - prevCount;
     if (newMm.length === 0) toast("Removed from list");
-    else if (diff > 0)
-      toast(diff === 1 ? "Added 1 focal length" : `Added ${diff} focal lengths`);
+    else if (diff > 0) toast(diff === 1 ? "Added 1 focal length" : `Added ${diff} focal lengths`);
     else if (diff < 0)
       toast(
-        Math.abs(diff) === 1
-          ? "Removed 1 focal length"
-          : `Removed ${Math.abs(diff)} focal lengths`,
+        Math.abs(diff) === 1 ? "Removed 1 focal length" : `Removed ${Math.abs(diff)} focal lengths`,
       );
     else toast("No changes");
   };
 
-
   const handlePrint = () => {
-    const hadCollapsed =
-      state.project.collapsed || state.categories.some((c) => c.collapsed);
+    const hadCollapsed = state.project.collapsed || state.categories.some((c) => c.collapsed);
     if (hadCollapsed) {
-      const collapsedIds = state.categories
-        .filter((c) => c.collapsed)
-        .map((c) => c.id);
+      const collapsedIds = state.categories.filter((c) => c.collapsed).map((c) => c.id);
       const projectWasCollapsed = state.project.collapsed;
       mutate((d) => {
         d.project.collapsed = false;
@@ -219,8 +200,8 @@ function Index() {
           Camera gear checklist
         </h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Track what you own and what you're still looking for — saved
-          automatically in this browser.
+          Track what you own and what you're still looking for — saved automatically in this
+          browser.
         </p>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -230,13 +211,8 @@ function Index() {
             { n: tTbc, label: "To be confirmed", cls: "text-tbc" },
             { n: tAll, label: "Total items", cls: "text-foreground" },
           ].map((s) => (
-            <div
-              key={s.label}
-              className="rounded-lg border border-border bg-card px-3 py-2.5"
-            >
-              <div className={`font-mono text-2xl leading-none ${s.cls}`}>
-                {s.n}
-              </div>
+            <div key={s.label} className="rounded-lg border border-border bg-card px-3 py-2.5">
+              <div className={`font-mono text-2xl leading-none ${s.cls}`}>{s.n}</div>
               <div className="slate-label mt-1.5">{s.label}</div>
             </div>
           ))}
@@ -328,9 +304,7 @@ function Index() {
                 })
               }
               onDelete={() => {
-                if (
-                  confirm(`Delete category "${cat.name}" and all its items?`)
-                ) {
+                if (confirm(`Delete category "${cat.name}" and all its items?`)) {
                   mutate((d) => {
                     d.categories = d.categories.filter((c) => c.id !== cat.id);
                   });
@@ -360,9 +334,7 @@ function Index() {
                 })
               }
               onAdd={(name, qty, group) => addItem(cat.id, name, qty, group)}
-              onAddFamily={(family, idx, qty) =>
-                addFamily(cat.id, family, idx, qty)
-              }
+              onAddFamily={(family, idx, qty) => addFamily(cat.id, family, idx, qty)}
             />
           );
         })}

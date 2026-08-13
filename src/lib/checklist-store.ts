@@ -91,9 +91,7 @@ function reorderCategoriesToCanonical(categories: Category[]): Category[] {
   const canonical = Object.keys(GEAR);
   const known: Category[] = [];
   const custom: Category[] = [];
-  categories.forEach((c) =>
-    (canonical.includes(c.name) ? known : custom).push(c),
-  );
+  categories.forEach((c) => (canonical.includes(c.name) ? known : custom).push(c));
   known.sort((a, b) => canonical.indexOf(a.name) - canonical.indexOf(b.name));
   return known.concat(custom);
 }
@@ -148,7 +146,7 @@ export function clearStorage() {
   }
 }
 
-const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
+const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
 export function useChecklist() {
   const [state, setState] = useState<State>(() => defaultData());

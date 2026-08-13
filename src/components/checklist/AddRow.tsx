@@ -1,15 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { FAMILIES, SUGGESTIONS, extractMm } from "@/data/gear";
-import type { Category } from "@/lib/checklist-store";
+import type { Family } from "@/data/gear";
+import type { Category, Item } from "@/lib/checklist-store";
 
-type Family = {
-  cat: string;
-  label: string;
-  info: string | null;
-  wholeSetSpec: string | null;
-  variants: string[];
-  group?: string | null;
-};
 type Flat = { name: string; qty: number; cat: string; group: string | null };
 
 type Props = {
@@ -22,12 +15,12 @@ type Mode = "closed" | "search" | "browseCats" | "browseItems" | "picker";
 
 function getCategoryGroups(catName: string) {
   const groups = new Map<string, { flats: Flat[]; families: Family[] }>();
-  (SUGGESTIONS as Flat[]).forEach((s) => {
+  SUGGESTIONS.forEach((s) => {
     if (s.cat !== catName || !s.group) return;
     if (!groups.has(s.group)) groups.set(s.group, { flats: [], families: [] });
     groups.get(s.group)!.flats.push(s);
   });
-  (FAMILIES as Family[]).forEach((f) => {
+  FAMILIES.forEach((f) => {
     if (f.cat !== catName || !f.group) return;
     if (!groups.has(f.group)) groups.set(f.group, { flats: [], families: [] });
     groups.get(f.group)!.families.push(f);
@@ -36,12 +29,12 @@ function getCategoryGroups(catName: string) {
 }
 
 function getAllCategoryItems(catName: string) {
-  const families = (FAMILIES as Family[])
-    .filter((f) => f.cat === catName)
-    .sort((a, b) => a.label.localeCompare(b.label));
-  const flats = (SUGGESTIONS as Flat[])
-    .filter((s) => s.cat === catName)
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const families = FAMILIES.filter((f) => f.cat === catName).sort((a, b) =>
+    a.label.localeCompare(b.label),
+  );
+  const flats = SUGGESTIONS.filter((s) => s.cat === catName).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   return { families, flats };
 }
 
@@ -89,11 +82,11 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     setFamily(f);
     // Pre-check whichever focal lengths this family already contributes to the
     // category, so the picker reflects the row's current content.
-    const existing = cat.items.find((x: any) => x.familyKey === f.label) as any;
+    const existing = cat.items.find((x) => x.familyKey === f.label);
     const next = new Set<number>();
     if (existing?.mmList) {
       f.variants.forEach((v, i) => {
-        if (existing.mmList.includes(extractMm(v))) next.add(i);
+        if (existing.mmList?.includes(extractMm(v))) next.add(i);
       });
     }
     setChecked(next);
@@ -110,7 +103,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
 
   const commitPicker = () => {
     if (!family) return;
-    const hadExisting = cat.items.some((x: any) => x.familyKey === family.label);
+    const hadExisting = cat.items.some((x) => x.familyKey === family.label);
     if (checked.size === 0 && !hadExisting) {
       closeAll();
       return;
@@ -120,7 +113,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     closeAll();
     inputRef.current?.focus();
   };
-
 
   const stop = (e: React.MouseEvent) => e.preventDefault();
 
@@ -196,8 +188,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
               if (results.length) setSel((s) => (s + 1) % results.length);
             } else if (e.key === "ArrowUp") {
               e.preventDefault();
-              if (results.length)
-                setSel((s) => (s - 1 + results.length) % results.length);
+              if (results.length) setSel((s) => (s - 1 + results.length) % results.length);
             } else if (e.key === "Enter") {
               e.preventDefault();
               const res = sel >= 0 ? results[sel] : undefined;
@@ -332,11 +323,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     (x) => !f || x.name.toLowerCase().includes(f),
                   );
                   if (fams.length + flats.length === 0)
-                    return (
-                      <p className="px-3 py-3 text-sm text-muted-foreground">
-                        No matches.
-                      </p>
-                    );
+                    return <p className="px-3 py-3 text-sm text-muted-foreground">No matches.</p>;
                   return (
                     <>
                       {fams.map((x) => (
@@ -351,8 +338,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                         >
                           <span>{x.label}</span>
                           <span className={chevronCls}>
-                            {x.variants.length}{" "}
-                            {x.variants.length === 1 ? "option ›" : "options ›"}
+                            {x.variants.length} {x.variants.length === 1 ? "option ›" : "options ›"}
                           </span>
                         </button>
                       ))}
@@ -414,40 +400,36 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                   )}
                 </div>
 
-                {family.wholeSetSpec && (() => {
-                  const allOn =
-                    family.variants.length > 0 &&
-                    checked.size === family.variants.length;
-                  return (
-                    <button
-                      type="button"
-                      onMouseDown={(e) => {
-                        stop(e);
-                        setChecked(
-                          allOn
-                            ? new Set<number>()
-                            : new Set(family.variants.map((_, i) => i)),
-                        );
-                      }}
-                      className={`${rowCls} border-b border-border/60`}
-                    >
-                      <span
-                        className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
-                          allOn
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border"
-                        }`}
+                {family.wholeSetSpec &&
+                  (() => {
+                    const allOn =
+                      family.variants.length > 0 && checked.size === family.variants.length;
+                    return (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          stop(e);
+                          setChecked(
+                            allOn ? new Set<number>() : new Set(family.variants.map((_, i) => i)),
+                          );
+                        }}
+                        className={`${rowCls} border-b border-border/60`}
                       >
-                        {allOn ? "✓" : ""}
-                      </span>
-                      <span className="font-semibold">
-                        Whole Set —{" "}
-                        {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
-                      </span>
-                    </button>
-                  );
-                })()}
-
+                        <span
+                          className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
+                            allOn
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border"
+                          }`}
+                        >
+                          {allOn ? "✓" : ""}
+                        </span>
+                        <span className="font-semibold">
+                          Whole Set — {family.wholeSetSpec.replace(/^Set\s*·?\s*/, "")}
+                        </span>
+                      </button>
+                    );
+                  })()}
 
                 {family.variants.map((v, i) => {
                   const f = pickerFilter.trim().toLowerCase();
@@ -470,9 +452,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     >
                       <span
                         className={`grid size-4 shrink-0 place-items-center rounded-sm border text-[10px] ${
-                          on
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border"
+                          on ? "border-primary bg-primary text-primary-foreground" : "border-border"
                         }`}
                       >
                         {on ? "✓" : ""}
@@ -500,7 +480,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     );
                   })()}
                 </div>
-
               </>
             )}
           </div>
