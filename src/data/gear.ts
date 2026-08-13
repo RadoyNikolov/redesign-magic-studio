@@ -56,7 +56,7 @@ const CATEGORY_PALETTE = [
 ];
 function catColor(index: number, name: string): string {
   const map = CATEGORY_COLOR_MAP as Record<string, string>;
-  return map[name] ?? CATEGORY_PALETTE[index % CATEGORY_PALETTE.length];
+  return map[name] ?? CATEGORY_PALETTE[index % CATEGORY_PALETTE.length] ?? "#888888";
 }
 
 export type Family = {
