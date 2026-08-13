@@ -177,9 +177,10 @@ const FILM_CAMERAS: [string, number][] = [
 /* ---------- Gear knowledge base (from your Camlist project lists) ----------
    Used only for typing suggestions — categories start empty. */
 const GEAR: Record<string, [string, number, string?][]> = {
-  Cameras: DIGITAL_CAMERAS.map(([n, q]) => [n, q, "Digital Camera"]).concat(
-    FILM_CAMERAS.map(([n, q]) => [n, q, "Film Camera"]),
-  ),
+  Cameras: [
+    ...DIGITAL_CAMERAS.map(([n, q]) => [n, q, "Digital Camera"] as [string, number, string]),
+    ...FILM_CAMERAS.map(([n, q]) => [n, q, "Film Camera"] as [string, number, string]),
+  ],
   Lenses: [
     ["Leitz Hugo Set · LPL · Metric (21-24-28-35-50-75-90mm T1.5 + 50-N T1.0)", 1, "Prime"],
     ["ARRI Zeiss Master Macro 100mm T2.0 · PL", 1, "Prime"],
