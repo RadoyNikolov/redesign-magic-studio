@@ -54,7 +54,7 @@ const CATEGORY_PALETTE = [
   "#D1603B",
   "#74564A",
 ];
-function catColor(index: number, name: string) {
+function catColor(index: number, name: string): string {
   if (name) {
     const mapped = CATEGORY_COLOR_MAP[name as keyof typeof CATEGORY_COLOR_MAP];
     if (mapped) return mapped;
