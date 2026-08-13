@@ -932,8 +932,8 @@ const SUGGESTIONS = Object.entries(GEAR).flatMap(([cat, items]) =>
      bundled line item; null means there's no meaningful bundle (e.g. matteboxes/
      Teradek/monitors — you pick a specific configuration, not "everything")
    - variants: the individual pickable items (combined as "label + variant") */
-const FAMILIES = [];
-function addLensFamily(label, mount, info, variants, group) {
+const FAMILIES: Family[] = [];
+function addLensFamily(label: string, mount: string, info: string, variants: string[], group?: string) {
   FAMILIES.push({
     cat: "Lenses",
     label,
@@ -943,24 +943,24 @@ function addLensFamily(label, mount, info, variants, group) {
     group,
   });
 }
-function addFilterFamily(label, grades, setLabelOverride) {
+function addFilterFamily(label: string, grades: string[], setLabelOverride?: string | null) {
   const wholeSetSpec =
     setLabelOverride || "Set (" + grades[0] + " – " + grades[grades.length - 1] + ")";
   FAMILIES.push({ cat: "Filters", label, info: null, wholeSetSpec, variants: grades });
 }
-function addMatteboxFamily(label, info, variants) {
+function addMatteboxFamily(label: string, info: string, variants: string[]) {
   FAMILIES.push({ cat: "Matteboxes", label, info, wholeSetSpec: null, variants });
 }
-function addTeradekFamily(label, info, variants) {
+function addTeradekFamily(label: string, info: string, variants: string[]) {
   FAMILIES.push({ cat: "Wireless Video", label, info, wholeSetSpec: null, variants });
 }
-function addMonitorFamily(brand, variants) {
+function addMonitorFamily(brand: string, variants: string[]) {
   FAMILIES.push({ cat: "Monitors", label: brand, info: null, wholeSetSpec: null, variants });
 }
-function wholeSetName(f) {
+function wholeSetName(f: Family) {
   return f.label + " · " + f.wholeSetSpec;
 }
-function variantName(f, v) {
+function variantName(f: Family, v: string) {
   return f.label + " " + v;
 }
 // Pulls just the focal-length token ("35mm" / "15-40mm") out of a fuller
@@ -968,7 +968,7 @@ function variantName(f, v) {
 // consolidated "Brand Series 33mm, 35mm, 45mm" row name. Falls back to the
 // full variant text if it doesn't start with a recognizable focal length
 // (e.g. filter grades like "0.3" or "1/8").
-function extractMm(v) {
+function extractMm(v: string) {
   const m = v.match(/^[\d.]+(?:-[\d.]+)?mm/);
   return m ? m[0] : v;
 }
