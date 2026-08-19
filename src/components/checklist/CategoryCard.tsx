@@ -113,6 +113,30 @@ export function CategoryCard({
           </button>
         ))}
       </span>
+      <select
+        aria-label="Assign to crew member"
+        title="Assign this item to someone from the team"
+        value={it.assigneeId ?? ""}
+        onChange={(e) => onAssign(it.id, e.target.value || null)}
+        className={`no-print shrink-0 rounded border bg-elevated px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors focus:border-primary focus:outline-none ${
+          it.assigneeId
+            ? "border-primary/60 text-primary"
+            : "border-border text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <option value="">◇ Unassigned</option>
+        {contacts.map((c) => (
+          <option key={c.id} value={c.id}>
+            {contactLabel(c)}
+          </option>
+        ))}
+      </select>
+      <span className="hidden font-mono text-[10px] uppercase print:inline">
+        {(() => {
+          const c = contacts.find((x) => x.id === it.assigneeId);
+          return c ? contactLabel(c) : "—";
+        })()}
+      </span>
       <span className="hidden font-mono text-[10px] uppercase print:inline">
         {it.status === "have"
           ? "Have"
