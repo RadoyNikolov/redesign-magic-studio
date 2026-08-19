@@ -1,5 +1,6 @@
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
+import { LETTER_INDEX, getLetterColor } from "@/lib/letter-index";
 import { AddRow } from "./AddRow";
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   onQty: (itemId: string, delta: number) => void;
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onAssign: (itemId: string, contactId: string | null) => void;
+  onLetterIndex: (itemId: string, letter: string | null) => void;
   onRemoveItem: (itemId: string) => void;
   onAdd: (name: string, qty: number, group?: string | null, assigneeId?: string | null) => void;
   onAddFamily: (
@@ -50,6 +52,7 @@ export function CategoryCard({
   onQty,
   onStatus,
   onAssign,
+  onLetterIndex,
   onRemoveItem,
   onAdd,
   onAddFamily,
@@ -97,6 +100,19 @@ export function CategoryCard({
       </span>
       <span className="hidden shrink-0 font-mono text-xs print:inline">{it.qty} ×</span>
       <span className="min-w-0 flex-1 text-sm leading-snug text-foreground">{it.name}</span>
+      {it.letterIndex && (
+        <span
+          className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold leading-none"
+          style={{
+            backgroundColor: getLetterColor(it.letterIndex).bg,
+            color: getLetterColor(it.letterIndex).text,
+          }}
+          title={`Index ${it.letterIndex}`}
+        >
+          {it.letterIndex}
+        </span>
+      )}
+
       <span className="no-print flex shrink-0 gap-1">
         {STATUS_META.map((s) => (
           <button
@@ -114,6 +130,24 @@ export function CategoryCard({
         ))}
       </span>
       <select
+        aria-label="Assign alphabetical index"
+        title="Assign an alphabetical index to this item"
+        value={it.letterIndex ?? ""}
+        onChange={(e) => onLetterIndex(it.id, e.target.value || null)}
+        className={`no-print shrink-0 rounded border bg-elevated px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors focus:border-primary focus:outline-none ${
+          it.letterIndex
+            ? "border-primary/60 text-primary"
+            : "border-border text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <option value="">◇ Index</option>
+        {LETTER_INDEX.map((letter) => (
+          <option key={letter} value={letter}>
+            {letter} — {letter === "A" ? "Red" : letter === "B" ? "Blue" : letter === "C" ? "Yellow" : letter === "D" ? "Green" : letter === "E" ? "Pink" : letter === "F" ? "Orange" : "Group"}
+          </option>
+        ))}
+      </select>
+      <select
         aria-label="Assign to crew member"
         title="Assign this item to someone from the team"
         value={it.assigneeId ?? ""}
@@ -124,6 +158,7 @@ export function CategoryCard({
             : "border-border text-muted-foreground hover:text-foreground"
         }`}
       >
+
         <option value="">◇ Unassigned</option>
         {contacts.map((c) => (
           <option key={c.id} value={c.id}>
