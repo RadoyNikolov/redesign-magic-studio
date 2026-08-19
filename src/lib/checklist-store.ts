@@ -15,6 +15,8 @@ export type Item = {
   mmList?: string[];
   /** id of a project contact this item is assigned to */
   assigneeId?: string | null;
+  /** alphabetical index letter used for grouping / labeling */
+  letterIndex?: string | null;
 };
 
 export type Category = {
