@@ -297,6 +297,15 @@ function Index() {
               visible={visible}
               collapsed={cat.collapsed && filter === "all"}
               showAddRow={filter === "all"}
+              contacts={state.project.contacts.filter((c) => c.name.trim() || c.role.trim())}
+              onAssign={(itemId, contactId) =>
+                mutate((d) => {
+                  const t = d.categories
+                    .find((c) => c.id === cat.id)
+                    ?.items.find((i) => i.id === itemId);
+                  if (t) t.assigneeId = contactId;
+                })
+              }
               onToggle={() =>
                 mutate((d) => {
                   const t = d.categories.find((c) => c.id === cat.id);

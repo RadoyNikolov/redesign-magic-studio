@@ -13,6 +13,8 @@ export type Item = {
   group: string | null;
   familyKey?: string;
   mmList?: string[];
+  /** id of a project contact this item is assigned to */
+  assigneeId?: string | null;
 };
 
 export type Category = {
