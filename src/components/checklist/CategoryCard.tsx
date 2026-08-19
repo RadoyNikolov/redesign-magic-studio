@@ -1,5 +1,6 @@
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
+import { LETTER_INDEX, getLetterColor } from "@/lib/letter-index";
 import { AddRow } from "./AddRow";
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   onQty: (itemId: string, delta: number) => void;
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onAssign: (itemId: string, contactId: string | null) => void;
+  onLetterIndex: (itemId: string, letter: string | null) => void;
   onRemoveItem: (itemId: string) => void;
   onAdd: (name: string, qty: number, group?: string | null, assigneeId?: string | null) => void;
   onAddFamily: (
