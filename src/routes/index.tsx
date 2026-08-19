@@ -306,6 +306,14 @@ function Index() {
                   if (t) t.assigneeId = contactId;
                 })
               }
+              onLetterIndex={(itemId, letter) =>
+                mutate((d) => {
+                  const t = d.categories
+                    .find((c) => c.id === cat.id)
+                    ?.items.find((i) => i.id === itemId);
+                  if (t) t.letterIndex = letter;
+                })
+              }
               onToggle={() =>
                 mutate((d) => {
                   const t = d.categories.find((c) => c.id === cat.id);
