@@ -1,4 +1,4 @@
-import type { Category, Item, Status } from "@/lib/checklist-store";
+import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
 
@@ -8,14 +8,23 @@ type Props = {
   visible: Item[];
   showAddRow: boolean;
   collapsed: boolean;
+  contacts: Contact[];
   onToggle: () => void;
   onDelete: () => void;
   onQty: (itemId: string, delta: number) => void;
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
+  onAssign: (itemId: string, contactId: string | null) => void;
   onRemoveItem: (itemId: string) => void;
-  onAdd: (name: string, qty: number, group?: string | null) => void;
-  onAddFamily: (family: Family, selectedIdx: number[], qty: number) => void;
+  onAdd: (name: string, qty: number, group?: string | null, assigneeId?: string | null) => void;
+  onAddFamily: (
+    family: Family,
+    selectedIdx: number[],
+    qty: number,
+    assigneeId?: string | null,
+  ) => void;
 };
+
+const contactLabel = (c: Contact) => c.name?.trim() || c.role?.trim() || "Unnamed";
 
 const STATUS_META = [
   { key: "have" as const, label: "✓ Have", on: "border-have/60 bg-have/15 text-have" },
