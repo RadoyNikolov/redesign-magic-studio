@@ -1,6 +1,8 @@
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
 import { LETTER_INDEX, getLetterColor } from "@/lib/letter-index";
+import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { AddRow } from "./AddRow";
 
 type Props = {
