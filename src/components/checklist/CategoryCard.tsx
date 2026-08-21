@@ -42,6 +42,19 @@ const STATUS_ACCENT: Record<string, string> = {
   tbc: "border-l-tbc",
 };
 
+function LetterBadge({ letter }: { letter: string }) {
+  const { bg, text } = getLetterColor(letter);
+  return (
+    <span
+      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold leading-none"
+      style={{ backgroundColor: bg, color: text }}
+      title={`Index ${letter}`}
+    >
+      {letter}
+    </span>
+  );
+}
+
 export function CategoryCard({
   cat,
   color,
