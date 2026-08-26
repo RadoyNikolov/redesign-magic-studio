@@ -27,8 +27,6 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   categoryName: string;
   item: Item | null;
-  /** crew members from the project setup, offered as Provider options */
-  providerOptions?: string[];
   onPatch: (patch: ItemDetails) => void;
   onLetterIndex: (letter: string | null) => void;
 };
@@ -46,7 +44,6 @@ export function ItemDetailsDialog({
   onOpenChange,
   categoryName,
   item,
-  providerOptions,
   onPatch,
   onLetterIndex,
 }: Props) {
@@ -130,11 +127,8 @@ export function ItemDetailsDialog({
 
           {fields.map((f) => {
             const value = (details[f.key] as string | null | undefined) ?? "";
-            const options =
-              f.key === "provider" && providerOptions && providerOptions.length > 0
-                ? providerOptions
-                : resolveOptions(f, item.name);
-            const isSelect = f.kind === "select" || (f.key === "provider" && !!options?.length);
+            const options = resolveOptions(f, item.name);
+            const isSelect = f.kind === "select";
             const node =
               f.kind === "textarea" ? (
                 <Textarea
