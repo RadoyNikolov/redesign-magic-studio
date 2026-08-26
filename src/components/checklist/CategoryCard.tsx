@@ -192,6 +192,13 @@ export function CategoryCard({
           </div>
         )}
 
+        {/* Lens mount mismatch warning */}
+        {mountMismatch && it.details?.lensMount && (
+          <p className="no-print mt-1.5 font-mono text-[10px] leading-snug text-look">
+            ⚠ Lens mount mismatch: {mountList} (this camera is {it.details.lensMount})
+          </p>
+        )}
+
         {/* Detail lines (print) */}
         {(printRows.length > 0 || rentalText) && (
           <div className="hidden print:block">
