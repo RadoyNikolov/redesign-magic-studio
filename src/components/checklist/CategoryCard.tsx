@@ -104,7 +104,8 @@ export function CategoryCard({
   const groupNames = [...grouped.keys()].sort((a, b) => a.localeCompare(b));
 
   const fields = fieldsForCategory(cat.name);
-  const hasLensMountField = fields.some((f) => f.key === "lensMount");
+
+
 
   // Determine the dominant lens mount in this category and flag only outliers.
   const mountCounts = new Map<string, number>();
