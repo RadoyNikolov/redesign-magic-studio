@@ -88,7 +88,12 @@ const CAMERA_FIELDS: FieldDef[] = [
   },
   { key: "squeeze", label: "Squeeze Factor", kind: "select", options: SQUEEZE_OPTIONS },
   { key: "rate", label: "Project Rate", kind: "select", options: RATE_OPTIONS },
-  { key: "frameLines", label: "Frame Lines", kind: "text", placeholder: "e.g. 2.39:1" },
+  {
+    key: "frameLines",
+    label: "Aspect Ratio",
+    kind: "select",
+    options: ["1.00", "1.33:1", "1.78:1", "1.85:1", "2.00:1", "2.39:1", "2.35:1"],
+  },
   { key: "lensMount", label: "Lens Mount", kind: "select", options: LENS_MOUNT_OPTIONS },
   { key: "mountAdapter", label: "Mount Adapter", kind: "select", optionsFor: mountAdapterOptions },
   { key: "serial", label: "Serial Number", kind: "text", placeholder: "e.g. 12345" },
