@@ -21,7 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { LetterIndexSelect } from "./LetterIndexSelect";
-import type { Item } from "@/lib/checklist-store";
+import type { Contact, Item } from "@/lib/checklist-store";
 import { formatDateRange } from "@/lib/dates";
 import { isoDate, parseIso } from "@/lib/dates";
 import { fieldsForCategory, resolveOptions, type ItemDetails } from "@/lib/item-fields";
@@ -33,6 +33,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   categoryName: string;
   item: Item | null;
+  contacts: Contact[];
   onPatch: (patch: ItemDetails) => void;
   onLetterIndex: (letter: string | null) => void;
 };
@@ -45,11 +46,14 @@ function fromDate(d?: Date) {
   return d ? isoDate(d.getFullYear(), d.getMonth(), d.getDate()) : "";
 }
 
+const contactLabel = (c: Contact) => c.name?.trim() || c.role?.trim() || "Unnamed";
+
 export function ItemDetailsDialog({
   open,
   onOpenChange,
   categoryName,
   item,
+  contacts,
   onPatch,
   onLetterIndex,
 }: Props) {
@@ -132,6 +136,7 @@ export function ItemDetailsDialog({
           {fields.map((f) => {
             const value = (details[f.key] as string | null | undefined) ?? "";
             const options = resolveOptions(f, item.name);
+            const isProvider = f.key === "provider";
             const isSelect = f.kind === "select";
             const node =
               f.kind === "textarea" ? (
@@ -142,6 +147,23 @@ export function ItemDetailsDialog({
                   onChange={(e) => onPatch({ [f.key]: e.target.value } as ItemDetails)}
                   className="mt-1.5 bg-elevated text-sm"
                 />
+              ) : isProvider ? (
+                <Select
+                  value={value || NONE}
+                  onValueChange={(v) => onPatch({ provider: v === NONE ? null : v })}
+                >
+                  <SelectTrigger className="mt-1.5 w-full bg-elevated text-sm">
+                    <SelectValue placeholder="—" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE}>—</SelectItem>
+                    {contacts.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {contactLabel(c)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               ) : isSelect && options && options.length > 0 ? (
                 <Select
                   value={value || NONE}

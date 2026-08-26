@@ -223,27 +223,8 @@ export function CategoryCard({
           </div>
         )}
 
-        {/* Bottom row: assignee, status, index dropdown */}
+        {/* Bottom row: status, details */}
         <div className="no-print mt-2 flex flex-wrap items-center gap-2">
-          <select
-            aria-label="Assign to crew member"
-            title="Assign this item to someone from the team"
-            value={it.assigneeId ?? ""}
-            onChange={(e) => onAssign(it.id, e.target.value || null)}
-            className={`shrink-0 rounded border bg-elevated px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors focus:border-primary focus:outline-none ${
-              it.assigneeId
-                ? "border-primary/60 text-primary"
-                : "border-border text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <option value="">◇ Unassigned</option>
-            {contacts.map((c) => (
-              <option key={c.id} value={c.id}>
-                {contactLabel(c)}
-              </option>
-            ))}
-          </select>
-
           <span className="flex shrink-0 gap-1">
             {STATUS_META.map((s) => (
               <button
@@ -355,6 +336,7 @@ export function CategoryCard({
         onOpenChange={(o) => !o && setOpenItemId(null)}
         categoryName={cat.name}
         item={openItem}
+        contacts={contacts}
         onPatch={(patch) => openItem && onDetails(openItem.id, patch)}
         onLetterIndex={(letter) => openItem && onLetterIndex(openItem.id, letter)}
       />
