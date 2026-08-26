@@ -21,7 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { LetterIndexSelect } from "./LetterIndexSelect";
-import type { Item } from "@/lib/checklist-store";
+import type { Contact, Item } from "@/lib/checklist-store";
 import { formatDateRange } from "@/lib/dates";
 import { isoDate, parseIso } from "@/lib/dates";
 import { fieldsForCategory, resolveOptions, type ItemDetails } from "@/lib/item-fields";
@@ -33,6 +33,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   categoryName: string;
   item: Item | null;
+  contacts: Contact[];
   onPatch: (patch: ItemDetails) => void;
   onLetterIndex: (letter: string | null) => void;
 };
