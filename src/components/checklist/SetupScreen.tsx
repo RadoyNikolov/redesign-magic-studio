@@ -29,6 +29,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const pickStart = useRef<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
+  const rentalSelectRef = useRef<HTMLSelectElement | null>(null);
   const p = state.project;
 
   const applyRentalCompany = (contactId: string, companyId: string) => {
@@ -40,6 +41,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
       t.email = company.email;
       t.phone = company.phone;
     });
+    if (rentalSelectRef.current) rentalSelectRef.current.value = "";
   };
 
   const addRentalCompany = () => {
