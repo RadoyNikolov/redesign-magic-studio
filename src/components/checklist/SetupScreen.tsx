@@ -225,7 +225,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                   }}
                 />
                 {isRental ? (
-                  <div className="relative">
+                  <div className="relative" data-rental-row>
                     <input
                       className={`${inputCls} pr-8`}
                       placeholder="Name"
@@ -244,11 +244,6 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                         });
                       }}
                       onFocus={() => setRentalOpenId(c.id)}
-                      onBlur={() =>
-                        window.setTimeout(() => {
-                          setRentalOpenId((id) => (id === c.id ? null : id));
-                        }, 150)
-                      }
                     />
                     <button
                       type="button"
