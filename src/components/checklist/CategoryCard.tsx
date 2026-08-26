@@ -25,7 +25,6 @@ type Props = {
   onToggle: () => void;
   onDelete: () => void;
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
-  onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onAssign: (itemId: string, contactId: string | null) => void;
   onLetterIndex: (itemId: string, letter: string | null) => void;
   onDetails: (itemId: string, patch: ItemDetails) => void;
