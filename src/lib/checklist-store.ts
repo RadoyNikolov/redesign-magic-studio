@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GEAR, uid } from "@/data/gear";
+import type { ItemDetails } from "@/lib/item-fields";
 
 const STORAGE_KEY = "cameraGearChecklist_v2";
 
