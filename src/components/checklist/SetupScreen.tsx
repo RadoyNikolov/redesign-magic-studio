@@ -220,6 +220,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                     <select
                       value={rentalPick}
                       onChange={(e) => {
+                        console.log("onChange fired", e.target.value, c.id);
                         const id = e.target.value;
                         if (id) applyRentalCompany(c.id, id);
                       }}
