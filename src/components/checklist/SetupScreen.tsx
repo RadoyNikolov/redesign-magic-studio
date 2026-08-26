@@ -203,8 +203,11 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               {index === 0 && c.role === "Production Company / Rental" ? (
                 <>
                   <span className="slate-label">{c.role}</span>
-                  <select
+                  <input
+                    className={inputCls}
+                    placeholder="Name"
                     value={c.name}
+                    list={`rental-companies-${c.id}`}
                     onChange={(e) => {
                       const name = e.target.value;
                       const company = p.rentalCompanies.find((rc) => rc.name === name);
@@ -218,15 +221,12 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                         }
                       });
                     }}
-                    className={RENTAL_SELECT_CLS}
-                  >
-                    <option value="">Select company…</option>
+                  />
+                  <datalist id={`rental-companies-${c.id}`}>
                     {p.rentalCompanies.map((rc) => (
-                      <option key={rc.id} value={rc.name}>
-                        {rc.name}
-                      </option>
+                      <option key={rc.id} value={rc.name} />
                     ))}
-                  </select>
+                  </datalist>
                   <input
                     className={inputCls}
                     placeholder="Email"
