@@ -199,9 +199,20 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               key={c.id}
               className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]"
             >
-              {index === 0 && c.role === "Production Company / Rental" ? (
+              {index === 0 ? (
                 <>
-                  <span className="slate-label">{c.role}</span>
+                  <input
+                    className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
+                    placeholder="Position"
+                    value={c.role}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.role = v;
+                      });
+                    }}
+                  />
                   <div className="relative">
                     <input
                       className={`${inputCls} pr-8`}
