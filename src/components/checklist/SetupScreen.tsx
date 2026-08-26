@@ -194,25 +194,27 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
       <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-panel">
         <h2 className="text-base tracking-[0.06em] text-foreground">Team</h2>
         <div className="mt-4 space-y-2">
-          {p.contacts.map((c, index) => (
-            <div
-              key={c.id}
-              className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1fr_1fr_1fr_1fr_auto]"
-            >
-              {index === 0 ? (
-                <>
-                  <input
-                    className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
-                    placeholder="Position"
-                    value={c.role}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (t) t.role = v;
-                      });
-                    }}
-                  />
+          {p.contacts.map((c) => {
+            const isRental = c.role.trim() === "Main Rental";
+            const rentalOpen = rentalOpenId === c.id;
+            return (
+              <div
+                key={c.id}
+                className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1fr_1fr_1fr_1fr_auto]"
+              >
+                <input
+                  className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
+                  placeholder="Position"
+                  value={c.role}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    mutate((d) => {
+                      const t = d.project.contacts.find((x) => x.id === c.id);
+                      if (t) t.role = v;
+                    });
+                  }}
+                />
+                {isRental ? (
                   <div className="relative">
                     <input
                       className={`${inputCls} pr-8`}
@@ -231,8 +233,12 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                           }
                         });
                       }}
-                      onFocus={() => setRentalOpen(true)}
-                      onBlur={() => window.setTimeout(() => setRentalOpen(false), 150)}
+                      onFocus={() => setRentalOpenId(c.id)}
+                      onBlur={() =>
+                        window.setTimeout(() => {
+                          setRentalOpenId((id) => (id === c.id ? null : id));
+                        }, 150)
+                      }
                     />
                     <button
                       type="button"
@@ -240,7 +246,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                       className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
                       onMouseDown={(e) => {
                         e.preventDefault();
-                        setRentalOpen((v) => !v);
+                        setRentalOpenId((id) => (id === c.id ? null : c.id));
                       }}
                     >
                       ▾
@@ -261,7 +267,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                                 t.email = rc.email;
                                 t.phone = rc.phone;
                               });
-                              setRentalOpen(false);
+                              setRentalOpenId(null);
                             }}
                           >
                             {rc.name}
@@ -279,7 +285,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                               t.email = "";
                               t.phone = "";
                             });
-                            setRentalOpen(false);
+                            setRentalOpenId(null);
                           }}
                         >
                           Clear / none
@@ -287,47 +293,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                       </div>
                     )}
                   </div>
-
-                  <input
-                    className={inputCls}
-                    placeholder="Email"
-                    value={c.email}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (t) t.email = v;
-                      });
-                    }}
-                  />
-                  <input
-                    className={inputCls}
-                    placeholder="Phone"
-                    value={c.phone}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (t) t.phone = v;
-                      });
-                    }}
-                  />
-                  <span className="hidden sm:block" />
-                </>
-              ) : (
-                <>
-                  <input
-                    className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
-                    placeholder="Position"
-                    value={c.role}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (t) t.role = v;
-                      });
-                    }}
-                  />
+                ) : (
                   <input
                     className={inputCls}
                     placeholder="Name"
@@ -340,46 +306,46 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                       });
                     }}
                   />
-                  <input
-                    className={inputCls}
-                    placeholder="Email"
-                    value={c.email}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (t) t.email = v;
-                      });
-                    }}
-                  />
-                  <input
-                    className={inputCls}
-                    placeholder="Phone"
-                    value={c.phone}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (t) t.phone = v;
-                      });
-                    }}
-                  />
-                  <button
-                    type="button"
-                    title="Remove position"
-                    onClick={() =>
-                      mutate((d) => {
-                        d.project.contacts = d.project.contacts.filter((x) => x.id !== c.id);
-                      })
-                    }
-                    className="justify-self-end rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
-                  >
-                    ✕
-                  </button>
-                </>
-              )}
-            </div>
-          ))}
+                )}
+                <input
+                  className={inputCls}
+                  placeholder="Email"
+                  value={c.email}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    mutate((d) => {
+                      const t = d.project.contacts.find((x) => x.id === c.id);
+                      if (t) t.email = v;
+                    });
+                  }}
+                />
+                <input
+                  className={inputCls}
+                  placeholder="Phone"
+                  value={c.phone}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    mutate((d) => {
+                      const t = d.project.contacts.find((x) => x.id === c.id);
+                      if (t) t.phone = v;
+                    });
+                  }}
+                />
+                <button
+                  type="button"
+                  title="Remove position"
+                  onClick={() =>
+                    mutate((d) => {
+                      d.project.contacts = d.project.contacts.filter((x) => x.id !== c.id);
+                    })
+                  }
+                  className="justify-self-end rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })}
         </div>
         <button
           type="button"
