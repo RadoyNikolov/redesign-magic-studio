@@ -235,7 +235,10 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                     </select>
                     <button
                       type="button"
-                      onClick={() => applyRentalCompany(c.id, p.rentalCompanies[0]?.id || "")}
+                      onClick={() => {
+                        console.log("TEST button clicked", c.id, p.rentalCompanies[0]?.id);
+                        applyRentalCompany(c.id, p.rentalCompanies[0]?.id || "");
+                      }}
                       className="rounded-md border border-border px-2 py-1 text-xs text-primary"
                     >
                       TEST
