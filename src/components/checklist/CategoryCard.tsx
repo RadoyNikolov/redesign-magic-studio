@@ -105,11 +105,21 @@ export function CategoryCard({
 
   const fields = fieldsForCategory(cat.name);
   const hasLensMountField = fields.some((f) => f.key === "lensMount");
-  const lensMounts = hasLensMountField
-    ? new Set(cat.items.map((i) => i.details?.lensMount).filter((m): m is string => !!m))
-    : new Set<string>();
-  const mountMismatch = lensMounts.size > 1;
-  const mountList = mountMismatch ? [...lensMounts].sort((a, b) => a.localeCompare(b)).join(" / ") : "";
+
+  // Determine the dominant lens mount in this category and flag only outliers.
+  const mountCounts = new Map<string, number>();
+  cat.items.forEach((i) => {
+    const m = i.details?.lensMount;
+    if (m) mountCounts.set(m, (mountCounts.get(m) || 0) + 1);
+  });
+  const dominantMount =
+    mountCounts.size > 0
+      ? [...mountCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]
+      : null;
+  const otherMounts = dominantMount
+    ? [...mountCounts.keys()].filter((m) => m !== dominantMount).sort((a, b) => a.localeCompare(b))
+    : [];
+
 
   const renderItem = (it: Item) => {
     const assigned = contacts.find((c) => c.id === it.assigneeId);
