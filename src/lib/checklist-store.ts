@@ -40,6 +40,13 @@ export type Contact = {
   phone: string;
 };
 
+export type RentalCompany = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+};
+
 export type Project = {
   name: string;
   type: string;
@@ -48,6 +55,7 @@ export type Project = {
   prep: DateRange;
   returnDate: DateRange;
   contacts: Contact[];
+  rentalCompanies: RentalCompany[];
 };
 
 export type State = {
