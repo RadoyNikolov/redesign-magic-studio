@@ -27,6 +27,8 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   categoryName: string;
   item: Item | null;
+  /** crew members from the project setup, offered as Provider options */
+  providerOptions?: string[];
   onPatch: (patch: ItemDetails) => void;
   onLetterIndex: (letter: string | null) => void;
 };
