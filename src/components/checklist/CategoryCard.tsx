@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
-import { LetterBadge, LetterIndexSelect } from "./LetterIndexSelect";
+import { LetterBadge } from "./LetterIndexSelect";
 import { ItemDetailsDialog } from "./ItemDetailsDialog";
 import { detailSummary, fieldsForCategory, type ItemDetails } from "@/lib/item-fields";
 import { formatDateRange } from "@/lib/dates";
