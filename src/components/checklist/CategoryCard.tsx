@@ -110,13 +110,13 @@ export function CategoryCard({
     return (
       <div
         key={it.id}
-        className={`grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 border-l-2 py-2 pl-3 transition-colors ${
+        className={`border-l-2 py-2 pl-3 transition-colors ${
           it.status ? STATUS_ACCENT[it.status] : "border-l-transparent"
         }`}
       >
-        {/* Quantity — screen controls or print value */}
-        <div className="row-span-full flex flex-col justify-start gap-2 pt-0.5">
-          <span className="no-print flex shrink-0 items-center gap-1">
+        {/* Top row: quantity + index badge + name + print info + remove */}
+        <div className="flex items-start gap-2">
+          <span className="no-print flex shrink-0 items-center gap-1 pt-0.5">
             <button
               type="button"
               title="Decrease quantity"
@@ -126,7 +126,7 @@ export function CategoryCard({
             >
               −
             </button>
-            <span className="w-9 text-center font-mono text-xs text-foreground">{it.qty} ×</span>
+            <span className="w-8 text-center font-mono text-xs text-foreground">{it.qty}×</span>
             <button
               type="button"
               title="Increase quantity"
@@ -137,20 +137,20 @@ export function CategoryCard({
             </button>
           </span>
           <span className="hidden font-mono text-xs print:inline">{it.qty} ×</span>
-        </div>
-
-        {/* Top row: index badge + name + print info + remove */}
-        <div className="flex items-center gap-3">
-          {it.letterIndex && <LetterBadge letter={it.letterIndex} />}
+          {it.letterIndex && (
+            <span className="pt-0.5">
+              <LetterBadge letter={it.letterIndex} />
+            </span>
+          )}
           <button
             type="button"
             onClick={() => setOpenItemId(it.id)}
             title="Open item details"
-            className="min-w-0 flex-1 text-left text-sm leading-snug text-foreground transition-colors hover:text-primary"
+            className="min-w-0 flex-1 pt-1 text-left text-sm leading-snug text-foreground transition-colors hover:text-primary"
           >
             {it.name}
           </button>
-          <span className="hidden shrink-0 font-mono text-[10px] uppercase print:inline">
+          <span className="hidden shrink-0 pt-1 font-mono text-[10px] uppercase print:inline">
             {assigned ? contactLabel(assigned) : "—"} · {statusText}
           </span>
           <button
@@ -166,7 +166,7 @@ export function CategoryCard({
 
         {/* Detail chips (screen) */}
         {(chips.length > 0 || rentalText) && (
-          <div className="no-print flex flex-wrap items-center gap-1.5">
+          <div className="no-print mt-1.5 flex flex-wrap items-center gap-1.5">
             {chips.map((c) => (
               <span
                 key={c}
@@ -198,7 +198,7 @@ export function CategoryCard({
         )}
 
         {/* Bottom row: assignee, status, index dropdown */}
-        <div className="no-print flex flex-wrap items-center gap-2">
+        <div className="no-print mt-2 flex flex-wrap items-center gap-2">
           <select
             aria-label="Assign to crew member"
             title="Assign this item to someone from the team"
