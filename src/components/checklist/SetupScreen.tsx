@@ -197,7 +197,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
           {p.contacts.map((c, index) => (
             <div
               key={c.id}
-              className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]"
+              className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1fr_1fr_1fr_1fr_auto]"
             >
               {index === 0 ? (
                 <>
@@ -414,7 +414,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
 
         {archiveOpen && (
           <div className="mt-4 space-y-3">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1.2fr_1fr_1fr_auto]">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
               <input
                 className={inputCls}
                 placeholder="Company name"
@@ -456,7 +456,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                 {p.rentalCompanies.map((rc) => (
                   <div
                     key={rc.id}
-                    className="grid grid-cols-1 items-center gap-2 py-2 sm:grid-cols-[1.2fr_1fr_1fr_auto]"
+                    className="grid grid-cols-1 items-center gap-2 py-2 sm:grid-cols-[1fr_1fr_1fr_auto]"
                   >
                     <span className="text-sm text-foreground">{rc.name}</span>
                     <span className="font-mono text-xs text-muted-foreground">{rc.email}</span>
