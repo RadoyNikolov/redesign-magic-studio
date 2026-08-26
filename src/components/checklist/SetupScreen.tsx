@@ -5,8 +5,6 @@ import { fieldLabel, formatDateRange } from "@/lib/dates";
 import { DateRangeCalendar } from "./DateRangeCalendar";
 import { SlateStripes } from "./SlateStripes";
 
-const RENTAL_SELECT_CLS =
-  "w-full rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground transition-colors focus:border-primary focus:outline-none";
 
 type Props = {
   state: State;
