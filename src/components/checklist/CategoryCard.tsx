@@ -104,6 +104,12 @@ export function CategoryCard({
   const groupNames = [...grouped.keys()].sort((a, b) => a.localeCompare(b));
 
   const fields = fieldsForCategory(cat.name);
+  const hasLensMountField = fields.some((f) => f.key === "lensMount");
+  const lensMounts = hasLensMountField
+    ? new Set(cat.items.map((i) => i.details?.lensMount).filter((m): m is string => !!m))
+    : new Set<string>();
+  const mountMismatch = lensMounts.size > 1;
+  const mountList = mountMismatch ? [...lensMounts].sort((a, b) => a.localeCompare(b)).join(" / ") : "";
 
   const renderItem = (it: Item) => {
     const assigned = contacts.find((c) => c.id === it.assigneeId);
