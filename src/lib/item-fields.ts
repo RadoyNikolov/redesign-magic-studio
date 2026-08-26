@@ -125,7 +125,10 @@ export function resolveOptions(field: FieldDef, itemName: string): string[] | nu
 }
 
 /** Short chips shown under the item name in the list. */
-export function detailSummary(details: ItemDetails | undefined): string[] {
+export function detailSummary(
+  details: ItemDetails | undefined,
+  contacts: { id: string; name?: string | null; role?: string | null }[],
+): string[] {
   if (!details) return [];
   const out: string[] = [];
   if (details.codec) out.push(details.codec);
@@ -134,7 +137,21 @@ export function detailSummary(details: ItemDetails | undefined): string[] {
   if (details.frameLines) out.push(details.frameLines);
   if (details.lensMount) out.push(details.lensMount);
   if (details.serial) out.push(`S/N ${details.serial}`);
+  if (details.provider) {
+    const c = contacts.find((x) => x.id === details.provider);
+    const label = c?.name?.trim() || c?.role?.trim() || "Provider";
+    out.push(`Provided by ${label}`);
+  }
   return out;
+}
+
+export function providerLabel(
+  providerId: string | null | undefined,
+  contacts: { id: string; name?: string | null; role?: string | null }[],
+): string | null {
+  if (!providerId) return null;
+  const c = contacts.find((x) => x.id === providerId);
+  return c?.name?.trim() || c?.role?.trim() || null;
 }
 
 export function hasAnyDetail(details: ItemDetails | undefined): boolean {
