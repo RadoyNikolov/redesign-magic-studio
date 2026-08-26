@@ -95,7 +95,6 @@ export function CategoryCard({
     onAdd(name, qty, group, assigneeId);
   };
 
-
   const cHave = cat.items.filter((i) => i.status === "have").length;
   const cLook = cat.items.filter((i) => i.status === "looking").length;
   const cTbc = cat.items.filter((i) => i.status === "tbc").length;
@@ -356,7 +355,6 @@ export function CategoryCard({
         onOpenChange={(o) => !o && setOpenItemId(null)}
         categoryName={cat.name}
         item={openItem}
-        providerOptions={contacts.map(contactLabel)}
         onPatch={(patch) => openItem && onDetails(openItem.id, patch)}
         onLetterIndex={(letter) => openItem && onLetterIndex(openItem.id, letter)}
       />

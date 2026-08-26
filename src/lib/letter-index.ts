@@ -1,6 +1,4 @@
-export const LETTER_INDEX = Array.from({ length: 26 }, (_, i) =>
-  String.fromCharCode(65 + i),
-);
+export const LETTER_INDEX = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 
 export const LETTER_COLORS: Record<string, { bg: string; text: string }> = {
   A: { bg: "oklch(0.62 0.2 25)", text: "#ffffff" }, // red
@@ -32,8 +30,10 @@ export const LETTER_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export function getLetterColor(letter: string) {
-  return LETTER_COLORS[letter.toUpperCase()] ?? {
-    bg: "oklch(0.6 0.05 250)",
-    text: "#ffffff",
-  };
+  return (
+    LETTER_COLORS[letter.toUpperCase()] ?? {
+      bg: "oklch(0.6 0.05 250)",
+      text: "#ffffff",
+    }
+  );
 }
