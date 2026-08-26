@@ -144,7 +144,7 @@ export function ItemDetailsDialog({
                   onChange={(e) => onPatch({ [f.key]: e.target.value } as ItemDetails)}
                   className="mt-1.5 bg-elevated text-sm"
                 />
-              ) : f.kind === "select" && options && options.length > 0 ? (
+              ) : isSelect && options && options.length > 0 ? (
                 <Select
                   value={value || NONE}
                   onValueChange={(v) =>
