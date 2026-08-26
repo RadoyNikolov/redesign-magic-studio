@@ -206,71 +206,132 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
       <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-panel">
         <h2 className="text-base tracking-[0.06em] text-foreground">Team</h2>
         <div className="mt-4 space-y-2">
-          {p.contacts.map((c) => (
+          {p.contacts.map((c, index) => (
             <div
               key={c.id}
               className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]"
             >
-              <input
-                className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
-                placeholder="Position"
-                value={c.role}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  mutate((d) => {
-                    const t = d.project.contacts.find((x) => x.id === c.id);
-                    if (t) t.role = v;
-                  });
-                }}
-              />
-              <input
-                className={inputCls}
-                placeholder="Name"
-                value={c.name}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  mutate((d) => {
-                    const t = d.project.contacts.find((x) => x.id === c.id);
-                    if (t) t.name = v;
-                  });
-                }}
-              />
-              <input
-                className={inputCls}
-                placeholder="Email"
-                value={c.email}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  mutate((d) => {
-                    const t = d.project.contacts.find((x) => x.id === c.id);
-                    if (t) t.email = v;
-                  });
-                }}
-              />
-              <input
-                className={inputCls}
-                placeholder="Phone"
-                value={c.phone}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  mutate((d) => {
-                    const t = d.project.contacts.find((x) => x.id === c.id);
-                    if (t) t.phone = v;
-                  });
-                }}
-              />
-              <button
-                type="button"
-                title="Remove position"
-                onClick={() =>
-                  mutate((d) => {
-                    d.project.contacts = d.project.contacts.filter((x) => x.id !== c.id);
-                  })
-                }
-                className="justify-self-end rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
-              >
-                ✕
-              </button>
+              {index === 0 && c.role === "Production Company / Rental" ? (
+                <div className="flex flex-col gap-1.5 sm:col-span-4">
+                  <span className="slate-label">{c.role}</span>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1.2fr_1.2fr_0.9fr_auto]">
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) applyRentalCompany(c.id, e.target.value);
+                      }}
+                      className={RENTAL_SELECT_CLS}
+                    >
+                      <option value="">Select from rental archive…</option>
+                      {p.rentalCompanies.map((rc) => (
+                        <option key={rc.id} value={rc.id}>
+                          {rc.name}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      className={inputCls}
+                      placeholder="Name"
+                      value={c.name}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        mutate((d) => {
+                          const t = d.project.contacts.find((x) => x.id === c.id);
+                          if (t) t.name = v;
+                        });
+                      }}
+                    />
+                    <input
+                      className={inputCls}
+                      placeholder="Email"
+                      value={c.email}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        mutate((d) => {
+                          const t = d.project.contacts.find((x) => x.id === c.id);
+                          if (t) t.email = v;
+                        });
+                      }}
+                    />
+                    <input
+                      className={inputCls}
+                      placeholder="Phone"
+                      value={c.phone}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        mutate((d) => {
+                          const t = d.project.contacts.find((x) => x.id === c.id);
+                          if (t) t.phone = v;
+                        });
+                      }}
+                    />
+                    <span className="hidden sm:block" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <input
+                    className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
+                    placeholder="Position"
+                    value={c.role}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.role = v;
+                      });
+                    }}
+                  />
+                  <input
+                    className={inputCls}
+                    placeholder="Name"
+                    value={c.name}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.name = v;
+                      });
+                    }}
+                  />
+                  <input
+                    className={inputCls}
+                    placeholder="Email"
+                    value={c.email}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.email = v;
+                      });
+                    }}
+                  />
+                  <input
+                    className={inputCls}
+                    placeholder="Phone"
+                    value={c.phone}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.phone = v;
+                      });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    title="Remove position"
+                    onClick={() =>
+                      mutate((d) => {
+                        d.project.contacts = d.project.contacts.filter((x) => x.id !== c.id);
+                      })
+                    }
+                    className="justify-self-end rounded-md border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                  >
+                    ✕
+                  </button>
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -291,6 +352,82 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
         >
           + Add position
         </button>
+      </section>
+
+      <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-panel">
+        <button
+          type="button"
+          onClick={() => setArchiveOpen((v) => !v)}
+          className="flex w-full items-center justify-between text-left"
+        >
+          <h2 className="text-base tracking-[0.06em] text-foreground">Rental companies archive</h2>
+          <span className="font-mono text-xs uppercase tracking-[0.12em] text-primary">
+            {archiveOpen ? "Close" : "Edit"}
+          </span>
+        </button>
+
+        {archiveOpen && (
+          <div className="mt-4 space-y-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1.2fr_1fr_1fr_auto]">
+              <input
+                className={inputCls}
+                placeholder="Company name"
+                value={archiveForm.name}
+                onChange={(e) => setArchiveForm((f) => ({ ...f, name: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") addRentalCompany();
+                }}
+              />
+              <input
+                className={inputCls}
+                placeholder="Email"
+                value={archiveForm.email}
+                onChange={(e) => setArchiveForm((f) => ({ ...f, email: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") addRentalCompany();
+                }}
+              />
+              <input
+                className={inputCls}
+                placeholder="Phone"
+                value={archiveForm.phone}
+                onChange={(e) => setArchiveForm((f) => ({ ...f, phone: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") addRentalCompany();
+                }}
+              />
+              <button
+                type="button"
+                onClick={addRentalCompany}
+                className="rounded-md bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground transition-opacity hover:opacity-80"
+              >
+                + Add
+              </button>
+            </div>
+
+            {p.rentalCompanies.length > 0 && (
+              <div className="divide-y divide-border/60">
+                {p.rentalCompanies.map((rc) => (
+                  <div
+                    key={rc.id}
+                    className="grid grid-cols-1 items-center gap-2 py-2 sm:grid-cols-[1.2fr_1fr_1fr_auto]"
+                  >
+                    <span className="text-sm text-foreground">{rc.name}</span>
+                    <span className="font-mono text-xs text-muted-foreground">{rc.email}</span>
+                    <span className="font-mono text-xs text-muted-foreground">{rc.phone}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeRentalCompany(rc.id)}
+                      className="justify-self-end rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       <button
