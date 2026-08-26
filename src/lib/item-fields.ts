@@ -1,12 +1,9 @@
-import { GEAR } from "@/data/gear";
-
 export type ItemDetails = {
   codec?: string | null;
   squeeze?: string | null;
   rate?: string | null;
   frameLines?: string | null;
   lensMount?: string | null;
-  mountAdapter?: string | null;
   rental?: { start: string; end: string } | null;
   serial?: string | null;
   provider?: string | null;
@@ -57,13 +54,6 @@ export function codecsFor(itemName: string): string[] | null {
   return brand ? (CODECS_BY_BRAND[brand] ?? null) : null;
 }
 
-/** Mount adapters already present in the gear dataset. */
-export function mountAdapterOptions(): string[] {
-  const rows = (GEAR as Record<string, [string, number, string?][]>)["Optical Accessories"] ?? [];
-  const list = rows.filter((r) => r[2] === "Mount Adapters").map((r) => r[0]);
-  return [...new Set(list)].sort((a, b) => a.localeCompare(b));
-}
-
 export const SQUEEZE_OPTIONS = ["1x", "1.3x", "1.5x", "1.8x", "2x"];
 export const RATE_OPTIONS = [
   "23.976 fps",
@@ -95,7 +85,6 @@ const CAMERA_FIELDS: FieldDef[] = [
     options: ["1.00", "1.33:1", "1.78:1", "1.85:1", "2.00:1", "2.39:1", "2.35:1"],
   },
   { key: "lensMount", label: "Lens Mount", kind: "select", options: LENS_MOUNT_OPTIONS },
-  { key: "mountAdapter", label: "Mount Adapter", kind: "select", optionsFor: mountAdapterOptions },
   { key: "serial", label: "Serial Number", kind: "text", placeholder: "e.g. 12345" },
   { key: "provider", label: "Provider", kind: "select" },
   { key: "notes", label: "Notes", kind: "textarea" },
