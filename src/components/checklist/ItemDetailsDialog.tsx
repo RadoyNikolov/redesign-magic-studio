@@ -46,6 +46,7 @@ export function ItemDetailsDialog({
   onOpenChange,
   categoryName,
   item,
+  providerOptions,
   onPatch,
   onLetterIndex,
 }: Props) {
