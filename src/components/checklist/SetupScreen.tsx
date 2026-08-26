@@ -25,32 +25,8 @@ const inputCls =
 export function SetupScreen({ state, mutate, onContinue }: Props) {
   const [calField, setCalField] = useState<DateField | null>(null);
   const pickStart = useRef<string | null>(null);
-  const [archiveOpen, setArchiveOpen] = useState(false);
   const [rentalOpenId, setRentalOpenId] = useState<string | null>(null);
-  const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
   const p = state.project;
-
-  const addRentalCompany = () => {
-    const name = archiveForm.name.trim();
-    const email = archiveForm.email.trim();
-    const phone = archiveForm.phone.trim();
-    if (!name && !email && !phone) return;
-    mutate((d) => {
-      d.project.rentalCompanies.push({
-        id: uid(),
-        name,
-        email,
-        phone,
-      });
-    });
-    setArchiveForm({ name: "", email: "", phone: "" });
-  };
-
-  const removeRentalCompany = (id: string) => {
-    mutate((d) => {
-      d.project.rentalCompanies = d.project.rentalCompanies.filter((rc) => rc.id !== id);
-    });
-  };
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
