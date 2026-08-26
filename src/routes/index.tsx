@@ -4,6 +4,8 @@ import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import type { Family } from "@/data/gear";
 import { useChecklist, type Category, type Item, type Status } from "@/lib/checklist-store";
 import { LETTER_INDEX } from "@/lib/letter-index";
+import type { ItemDetails } from "@/lib/item-fields";
+
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
 import { SetupScreen } from "@/components/checklist/SetupScreen";
@@ -135,7 +137,22 @@ function Index() {
       };
       // Duplicates of the same gear usually share the same spec sheet —
       // prefill it so the user only tweaks what differs.
-      if (source?.details) next.details = { ...source.details };
+      if (source?.details) {
+        next.details = { ...source.details };
+      } else {
+        // Different gear in the same category: carry over the project-wide
+        // settings (squeeze, rate, aspect ratio) from the last configured item.
+        const last = [...cat.items].reverse().find((x) => x.details);
+        const d0 = last?.details;
+        if (d0) {
+          const shared: ItemDetails = {};
+          if (d0.squeeze) shared.squeeze = d0.squeeze;
+          if (d0.rate) shared.rate = d0.rate;
+          if (d0.frameLines) shared.frameLines = d0.frameLines;
+          if (Object.keys(shared).length) next.details = shared;
+        }
+      }
+
       // Auto-assign the next available alphabetical index (A→B→C…) per category.
       next.letterIndex = nextLetterIndex(cat, source?.letterIndex);
       assignedLetter = next.letterIndex;
