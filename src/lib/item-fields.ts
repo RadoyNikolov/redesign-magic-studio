@@ -9,7 +9,6 @@ export type ItemDetails = {
   mountAdapter?: string | null;
   rental?: { start: string; end: string } | null;
   serial?: string | null;
-  provider?: string | null;
   notes?: string | null;
   privateNotes?: string | null;
 };
@@ -99,7 +98,6 @@ const CAMERA_FIELDS: FieldDef[] = [
   { key: "lensMount", label: "Lens Mount", kind: "select", options: LENS_MOUNT_OPTIONS },
   { key: "mountAdapter", label: "Mount Adapter", kind: "select", optionsFor: mountAdapterOptions },
   { key: "serial", label: "Serial Number", kind: "text", placeholder: "e.g. 12345" },
-  { key: "provider", label: "Provider", kind: "text", placeholder: "Rental house / owner" },
   { key: "notes", label: "Notes", kind: "textarea" },
   { key: "privateNotes", label: "Private Notes", kind: "textarea", private: true },
 ];
@@ -107,7 +105,6 @@ const CAMERA_FIELDS: FieldDef[] = [
 /** Shared fields used by categories that have no dedicated schema yet. */
 const GENERIC_FIELDS: FieldDef[] = [
   { key: "serial", label: "Serial Number", kind: "text" },
-  { key: "provider", label: "Provider", kind: "text", placeholder: "Rental house / owner" },
   { key: "notes", label: "Notes", kind: "textarea" },
   { key: "privateNotes", label: "Private Notes", kind: "textarea", private: true },
 ];
@@ -141,7 +138,6 @@ export function detailSummary(details: ItemDetails | undefined): string[] {
   if (details.frameLines) out.push(details.frameLines);
   if (details.lensMount) out.push(details.lensMount);
   if (details.serial) out.push(`S/N ${details.serial}`);
-  if (details.provider) out.push(details.provider);
   return out;
 }
 
