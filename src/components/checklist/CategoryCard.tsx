@@ -202,12 +202,15 @@ export function CategoryCard({
           </div>
         )}
 
-        {/* Lens mount mismatch warning */}
-        {mountMismatch && it.details?.lensMount && (
-          <p className="no-print mt-1.5 font-mono text-[10px] leading-snug text-look">
-            ⚠ Lens mount mismatch: {mountList} (this camera is {it.details.lensMount})
-          </p>
-        )}
+        {/* Lens mount mismatch warning — only on the outlier camera */}
+        {dominantMount &&
+          it.details?.lensMount &&
+          it.details.lensMount !== dominantMount && (
+            <p className="no-print mt-1.5 font-mono text-[10px] leading-snug text-look">
+              ⚠ Lens mount mismatch: this camera is {it.details.lensMount} (others are {dominantMount})
+            </p>
+          )}
+
 
         {/* Detail lines (print) */}
         {(printRows.length > 0 || rentalText) && (
