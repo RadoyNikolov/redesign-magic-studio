@@ -61,7 +61,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   return (
     <div className="mx-auto w-full max-w-[960px] px-4 pb-24">
       <header className="pt-8">
-        {/* <SlateStripes /> */}
+        <SlateStripes />
         <p className="slate-label mt-5">Step 01 — Intake</p>
         <h1 className="mt-1 text-[clamp(2rem,6vw,3rem)] leading-[0.95] text-foreground">
           New project setup
