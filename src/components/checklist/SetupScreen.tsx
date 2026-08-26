@@ -29,20 +29,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const pickStart = useRef<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
-  const [rentalPick, setRentalPick] = useState("");
   const p = state.project;
-
-  const applyRentalCompany = (contactId: string, companyId: string) => {
-    const company = p.rentalCompanies.find((rc) => rc.id === companyId);
-    mutate((d) => {
-      const t = d.project.contacts.find((x) => x.id === contactId);
-      if (!t || !company) return;
-      t.name = company.name;
-      t.email = company.email;
-      t.phone = company.phone;
-    });
-    setRentalPick("");
-  };
 
   const addRentalCompany = () => {
     const name = archiveForm.name.trim();
@@ -214,63 +201,58 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]"
             >
               {index === 0 && c.role === "Production Company / Rental" ? (
-                <div className="flex flex-col gap-1.5 sm:col-span-4">
+                <>
                   <span className="slate-label">{c.role}</span>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]">
-                    <select
-                      value={rentalPick}
-                      onChange={(e) => {
-                        const id = e.target.value;
-                        if (id) applyRentalCompany(c.id, id);
-                      }}
-                      className={RENTAL_SELECT_CLS}
-                    >
-                      <option value="">Select from rental archive…</option>
-                      {p.rentalCompanies.map((rc) => (
-                        <option key={rc.id} value={rc.id}>
-                          {rc.name}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      className={inputCls}
-                      placeholder="Name"
-                      value={c.name}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        mutate((d) => {
-                          const t = d.project.contacts.find((x) => x.id === c.id);
-                          if (t) t.name = v;
-                        });
-                      }}
-                    />
-                    <input
-                      className={inputCls}
-                      placeholder="Email"
-                      value={c.email}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        mutate((d) => {
-                          const t = d.project.contacts.find((x) => x.id === c.id);
-                          if (t) t.email = v;
-                        });
-                      }}
-                    />
-                    <input
-                      className={inputCls}
-                      placeholder="Phone"
-                      value={c.phone}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        mutate((d) => {
-                          const t = d.project.contacts.find((x) => x.id === c.id);
-                          if (t) t.phone = v;
-                        });
-                      }}
-                    />
-                    <span className="hidden sm:block" />
-                  </div>
-                </div>
+                  <select
+                    value={c.name}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      const company = p.rentalCompanies.find((rc) => rc.name === name);
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (!t) return;
+                        t.name = name;
+                        if (company) {
+                          t.email = company.email;
+                          t.phone = company.phone;
+                        }
+                      });
+                    }}
+                    className={RENTAL_SELECT_CLS}
+                  >
+                    <option value="">Select company…</option>
+                    {p.rentalCompanies.map((rc) => (
+                      <option key={rc.id} value={rc.name}>
+                        {rc.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    className={inputCls}
+                    placeholder="Email"
+                    value={c.email}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.email = v;
+                      });
+                    }}
+                  />
+                  <input
+                    className={inputCls}
+                    placeholder="Phone"
+                    value={c.phone}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      mutate((d) => {
+                        const t = d.project.contacts.find((x) => x.id === c.id);
+                        if (t) t.phone = v;
+                      });
+                    }}
+                  />
+                  <span className="hidden sm:block" />
+                </>
               ) : (
                 <>
                   <input
