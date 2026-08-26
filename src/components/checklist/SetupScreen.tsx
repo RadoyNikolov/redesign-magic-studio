@@ -33,9 +33,11 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const p = state.project;
 
   const applyRentalCompany = (contactId: string, companyId: string) => {
+    console.log("applyRentalCompany", contactId, companyId, p.rentalCompanies);
     const company = p.rentalCompanies.find((rc) => rc.id === companyId);
     mutate((d) => {
       const t = d.project.contacts.find((x) => x.id === contactId);
+      console.log("mutate", !!t, !!company, company);
       if (!t || !company) return;
       t.name = company.name;
       t.email = company.email;
