@@ -4,6 +4,8 @@ import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import type { Family } from "@/data/gear";
 import { useChecklist, type Category, type Item, type Status } from "@/lib/checklist-store";
 import { LETTER_INDEX } from "@/lib/letter-index";
+import type { ItemDetails } from "@/lib/item-fields";
+
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
 import { SetupScreen } from "@/components/checklist/SetupScreen";
