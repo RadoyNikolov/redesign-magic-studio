@@ -1,5 +1,3 @@
-import { GEAR } from "@/data/gear";
-
 export type ItemDetails = {
   codec?: string | null;
   squeeze?: string | null;
