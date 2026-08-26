@@ -260,6 +260,39 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                 <div className="sticky top-0 border-b border-border bg-popover px-3 py-2">
                   <span className="slate-label">{cat.name} — browse</span>
                 </div>
+                {(() => {
+                  const seen = new Set<string>();
+                  const recent = cat.items.filter((it: Item) => {
+                    if (!it.name || seen.has(it.name)) return false;
+                    seen.add(it.name);
+                    return true;
+                  });
+                  if (recent.length === 0) return null;
+                  return (
+                    <div className="border-b border-border/60">
+                      <div className="px-3 pb-1 pt-2">
+                        <span className="slate-label">Already added</span>
+                      </div>
+                      {recent.map((it: Item) => {
+                        const src = (SUGGESTIONS as Flat[]).find((s) => s.name === it.name);
+                        return (
+                          <button
+                            key={`recent-${it.name}`}
+                            type="button"
+                            onMouseDown={(e) => {
+                              stop(e);
+                              addFlat(it.name, qty, src?.group ?? null);
+                            }}
+                            className={rowCls}
+                          >
+                            <span>{it.name}</span>
+                            <span className={chevronCls}>+ again</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
                 {[...groups.keys()]
                   .sort((a, b) => a.localeCompare(b))
                   .map((name) => {
