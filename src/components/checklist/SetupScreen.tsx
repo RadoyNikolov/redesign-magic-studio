@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { DateField, RentalCompany, State } from "@/lib/checklist-store";
+import type { DateField, State } from "@/lib/checklist-store";
 import { uid } from "@/data/gear";
 import { fieldLabel, formatDateRange } from "@/lib/dates";
 import { DateRangeCalendar } from "./DateRangeCalendar";
@@ -25,32 +25,8 @@ const inputCls =
 export function SetupScreen({ state, mutate, onContinue }: Props) {
   const [calField, setCalField] = useState<DateField | null>(null);
   const pickStart = useRef<string | null>(null);
-  const [archiveOpen, setArchiveOpen] = useState(false);
   const [rentalOpenId, setRentalOpenId] = useState<string | null>(null);
-  const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
   const p = state.project;
-
-  const addRentalCompany = () => {
-    const name = archiveForm.name.trim();
-    const email = archiveForm.email.trim();
-    const phone = archiveForm.phone.trim();
-    if (!name && !email && !phone) return;
-    mutate((d) => {
-      d.project.rentalCompanies.push({
-        id: uid(),
-        name,
-        email,
-        phone,
-      });
-    });
-    setArchiveForm({ name: "", email: "", phone: "" });
-  };
-
-  const removeRentalCompany = (id: string) => {
-    mutate((d) => {
-      d.project.rentalCompanies = d.project.rentalCompanies.filter((rc) => rc.id !== id);
-    });
-  };
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -366,82 +342,6 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
         >
           + Add position
         </button>
-      </section>
-
-      <section className="mt-4 rounded-xl border border-border bg-card p-5 shadow-panel">
-        <button
-          type="button"
-          onClick={() => setArchiveOpen((v) => !v)}
-          className="flex w-full items-center justify-between text-left"
-        >
-          <h2 className="text-base tracking-[0.06em] text-foreground">Rental companies archive</h2>
-          <span className="font-mono text-xs uppercase tracking-[0.12em] text-primary">
-            {archiveOpen ? "Close" : "Edit"}
-          </span>
-        </button>
-
-        {archiveOpen && (
-          <div className="mt-4 space-y-3">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
-              <input
-                className={inputCls}
-                placeholder="Company name"
-                value={archiveForm.name}
-                onChange={(e) => setArchiveForm((f) => ({ ...f, name: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") addRentalCompany();
-                }}
-              />
-              <input
-                className={inputCls}
-                placeholder="Email"
-                value={archiveForm.email}
-                onChange={(e) => setArchiveForm((f) => ({ ...f, email: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") addRentalCompany();
-                }}
-              />
-              <input
-                className={inputCls}
-                placeholder="Phone"
-                value={archiveForm.phone}
-                onChange={(e) => setArchiveForm((f) => ({ ...f, phone: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") addRentalCompany();
-                }}
-              />
-              <button
-                type="button"
-                onClick={addRentalCompany}
-                className="rounded-md bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground transition-opacity hover:opacity-80"
-              >
-                + Add
-              </button>
-            </div>
-
-            {p.rentalCompanies.length > 0 && (
-              <div className="divide-y divide-border/60">
-                {p.rentalCompanies.map((rc) => (
-                  <div
-                    key={rc.id}
-                    className="grid grid-cols-1 items-center gap-2 py-2 sm:grid-cols-[1fr_1fr_1fr_auto]"
-                  >
-                    <span className="text-sm text-foreground">{rc.name}</span>
-                    <span className="font-mono text-xs text-muted-foreground">{rc.email}</span>
-                    <span className="font-mono text-xs text-muted-foreground">{rc.phone}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeRentalCompany(rc.id)}
-                      className="justify-self-end rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </section>
 
       <button
