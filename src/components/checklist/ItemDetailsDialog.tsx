@@ -80,8 +80,8 @@ export function ItemDetailsDialog({
           <Calendar
             mode="range"
             numberOfMonths={1}
-            selected={range}
-            defaultMonth={toDate(rental?.start)}
+            {...(range ? { selected: range } : {})}
+            {...(rental?.start ? { defaultMonth: parseIso(rental.start) } : {})}
             onSelect={(r) =>
               onPatch({
                 rental: r?.from
