@@ -40,6 +40,13 @@ export type Contact = {
   phone: string;
 };
 
+export type RentalCompany = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+};
+
 export type Project = {
   name: string;
   type: string;
@@ -48,6 +55,7 @@ export type Project = {
   prep: DateRange;
   returnDate: DateRange;
   contacts: Contact[];
+  rentalCompanies: RentalCompany[];
 };
 
 export type State = {
@@ -64,6 +72,13 @@ export const DEFAULT_ROLES = [
   "1st Assistant Camera",
   "2nd Assistant Camera",
   "DIT",
+];
+
+export const DEFAULT_RENTAL_COMPANIES: RentalCompany[] = [
+  { id: uid(), name: "Nu Boyana Film Studios", email: "office@b2yproductions.com", phone: "+359888550124" },
+  { id: uid(), name: "B2Y Productions", email: "office@b2yproductions.com", phone: "+359888550124" },
+  { id: uid(), name: "Magic Shop", email: "office@magicshoprental.com", phone: "+359 896 482 295" },
+  { id: uid(), name: "Pro Camera", email: "rental@procamera.bg", phone: "+359 87 929 1110" },
 ];
 
 function defaultData(): State {
@@ -83,6 +98,7 @@ function defaultData(): State {
         email: "",
         phone: "",
       })),
+      rentalCompanies: DEFAULT_RENTAL_COMPANIES.map((c) => ({ ...c })),
     },
     categories: Object.keys(GEAR).map((name) => ({
       id: uid(),
@@ -125,6 +141,9 @@ export function loadState(): State {
               : { start: "", end: "" };
         });
         if (d.view === undefined) d.view = "checklist";
+        if (!Array.isArray(d.project.rentalCompanies) || d.project.rentalCompanies.length === 0) {
+          d.project.rentalCompanies = DEFAULT_RENTAL_COMPANIES.map((c) => ({ ...c }));
+        }
         d.categories.forEach((c: Category) => {
           const renamed = RENAMES[c.name];
           if (renamed) c.name = renamed;
