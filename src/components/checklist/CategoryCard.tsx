@@ -235,11 +235,6 @@ export function CategoryCard({
             ))}
           </span>
 
-          <LetterIndexSelect
-            value={it.letterIndex}
-            onChange={(letter) => onLetterIndex(it.id, letter)}
-          />
-
           <button
             type="button"
             onClick={() => setOpenItemId(it.id)}
