@@ -8,6 +8,7 @@ import {
   detailSummary,
   fieldsForCategory,
   hasFieldSchema,
+  providerLabel,
   type ItemDetails,
 } from "@/lib/item-fields";
 import { formatDateRange } from "@/lib/dates";
