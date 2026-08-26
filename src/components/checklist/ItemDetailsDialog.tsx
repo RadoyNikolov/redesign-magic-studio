@@ -136,6 +136,7 @@ export function ItemDetailsDialog({
           {fields.map((f) => {
             const value = (details[f.key] as string | null | undefined) ?? "";
             const options = resolveOptions(f, item.name);
+            const isProvider = f.key === "provider";
             const isSelect = f.kind === "select";
             const node =
               f.kind === "textarea" ? (
@@ -146,6 +147,23 @@ export function ItemDetailsDialog({
                   onChange={(e) => onPatch({ [f.key]: e.target.value } as ItemDetails)}
                   className="mt-1.5 bg-elevated text-sm"
                 />
+              ) : isProvider ? (
+                <Select
+                  value={value || NONE}
+                  onValueChange={(v) => onPatch({ provider: v === NONE ? null : v })}
+                >
+                  <SelectTrigger className="mt-1.5 w-full bg-elevated text-sm">
+                    <SelectValue placeholder="—" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE}>—</SelectItem>
+                    {contacts.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {contactLabel(c)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               ) : isSelect && options && options.length > 0 ? (
                 <Select
                   value={value || NONE}
