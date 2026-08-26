@@ -116,9 +116,7 @@ export function CategoryCard({
     mountCounts.size > 0
       ? [...mountCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]
       : null;
-  const otherMounts = dominantMount
-    ? [...mountCounts.keys()].filter((m) => m !== dominantMount).sort((a, b) => a.localeCompare(b))
-    : [];
+
 
 
   const renderItem = (it: Item) => {
