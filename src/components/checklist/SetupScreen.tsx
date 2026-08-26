@@ -27,7 +27,42 @@ const inputCls =
 export function SetupScreen({ state, mutate, onContinue }: Props) {
   const [calField, setCalField] = useState<DateField | null>(null);
   const pickStart = useRef<string | null>(null);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
   const p = state.project;
+
+  const applyRentalCompany = (contactId: string, companyId: string) => {
+    const company = p.rentalCompanies.find((rc) => rc.id === companyId);
+    mutate((d) => {
+      const t = d.project.contacts.find((x) => x.id === contactId);
+      if (!t || !company) return;
+      t.name = company.name;
+      t.email = company.email;
+      t.phone = company.phone;
+    });
+  };
+
+  const addRentalCompany = () => {
+    const name = archiveForm.name.trim();
+    const email = archiveForm.email.trim();
+    const phone = archiveForm.phone.trim();
+    if (!name && !email && !phone) return;
+    mutate((d) => {
+      d.project.rentalCompanies.push({
+        id: uid(),
+        name,
+        email,
+        phone,
+      });
+    });
+    setArchiveForm({ name: "", email: "", phone: "" });
+  };
+
+  const removeRentalCompany = (id: string) => {
+    mutate((d) => {
+      d.project.rentalCompanies = d.project.rentalCompanies.filter((rc) => rc.id !== id);
+    });
+  };
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
