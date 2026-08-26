@@ -152,11 +152,6 @@ export function CategoryCard({
             </span>
           )}
           <button
-            <span className="pt-0.5">
-              <LetterBadge letter={it.letterIndex} />
-            </span>
-          )}
-          <button
             type="button"
             onClick={() => setOpenItemId(it.id)}
             title="Open item details"
