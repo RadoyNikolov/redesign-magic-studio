@@ -199,7 +199,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               key={c.id}
               className="grid grid-cols-1 items-center gap-2 border-b border-border/60 pb-2 last:border-0 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]"
             >
-              {index === 0 && c.role === "Production Company / Rental" ? (
+              {index === 0 ? (
                 <>
                   <input
                     className={`${inputCls} font-mono text-xs uppercase tracking-[0.1em]`}
