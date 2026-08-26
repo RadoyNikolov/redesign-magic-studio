@@ -130,7 +130,11 @@ export function ItemDetailsDialog({
 
           {fields.map((f) => {
             const value = (details[f.key] as string | null | undefined) ?? "";
-            const options = resolveOptions(f, item.name);
+            const options =
+              f.key === "provider" && providerOptions && providerOptions.length > 0
+                ? providerOptions
+                : resolveOptions(f, item.name);
+            const isSelect = f.kind === "select" || (f.key === "provider" && !!options?.length);
             const node =
               f.kind === "textarea" ? (
                 <Textarea
