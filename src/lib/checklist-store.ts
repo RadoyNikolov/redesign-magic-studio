@@ -65,12 +65,12 @@ export type State = {
 };
 
 export const DEFAULT_ROLES = [
-  "Production Company / Rental",
+  "Main Rental",
   "Producer",
   "Line Producer",
-  "Director of Photography",
-  "1st Assistant Camera",
-  "2nd Assistant Camera",
+  "DoP",
+  "1st AC",
+  "2nd AC",
   "DIT",
 ];
 
