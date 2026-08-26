@@ -336,6 +336,7 @@ export function CategoryCard({
         onOpenChange={(o) => !o && setOpenItemId(null)}
         categoryName={cat.name}
         item={openItem}
+        contacts={contacts}
         onPatch={(patch) => openItem && onDetails(openItem.id, patch)}
         onLetterIndex={(letter) => openItem && onLetterIndex(openItem.id, letter)}
       />
