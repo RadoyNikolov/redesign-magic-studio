@@ -26,6 +26,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const [calField, setCalField] = useState<DateField | null>(null);
   const pickStart = useRef<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [rentalOpen, setRentalOpen] = useState(false);
   const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
   const p = state.project;
 
