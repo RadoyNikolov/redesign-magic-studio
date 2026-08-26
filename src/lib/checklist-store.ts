@@ -17,6 +17,8 @@ export type Item = {
   assigneeId?: string | null;
   /** alphabetical index letter used for grouping / labeling */
   letterIndex?: string | null;
+  /** per-item spec sheet, fields depend on the category (see item-fields.ts) */
+  details?: ItemDetails;
 };
 
 export type Category = {
