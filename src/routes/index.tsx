@@ -101,26 +101,22 @@ function Index() {
   const addItem = (catId: string, name: string, group?: string | null) => {
     const clean = name.trim();
     if (!clean) return;
-    let message = "";
+    let dupIndex = 0;
     mutate((d) => {
       const cat = d.categories.find((c) => c.id === catId);
       if (!cat) return;
-      const existing = cat.items.find((x) => x.name.toLowerCase() === clean.toLowerCase());
-      if (existing) {
-        existing.qty += 1;
-        message = `Quantity increased to ${existing.qty} ×`;
-      } else {
-        cat.items.push({
-          id: uid(),
-          name: clean,
-          qty: 1,
-          status: null,
-          group: group ?? null,
-        });
-      }
+      dupIndex = cat.items.filter((x) => x.name.toLowerCase() === clean.toLowerCase()).length;
+      cat.items.push({
+        id: uid(),
+        name: clean,
+        qty: 1,
+        status: null,
+        group: group ?? null,
+      });
     });
-    if (message) toast(message);
+    toast(dupIndex > 0 ? `${clean} added (#${dupIndex + 1})` : `${clean} added`);
   };
+
 
   const addFamily = (catId: string, family: Family, selectedIdx: number[]) => {
     // The picker opens with already-added focal lengths pre-checked, so whatever
