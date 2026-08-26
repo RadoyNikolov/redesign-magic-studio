@@ -2,11 +2,28 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
 import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import type { Family } from "@/data/gear";
-import { useChecklist, type Item, type Status } from "@/lib/checklist-store";
+import { useChecklist, type Category, type Item, type Status } from "@/lib/checklist-store";
+import { LETTER_INDEX } from "@/lib/letter-index";
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
 import { SetupScreen } from "@/components/checklist/SetupScreen";
 import { SlateStripes } from "@/components/checklist/SlateStripes";
+
+function nextLetterIndex(cat: Category, afterLetter?: string | null): string | null {
+  const used = new Set(
+    cat.items.map((i) => i.letterIndex?.toUpperCase()).filter((l): l is string => !!l),
+  );
+  const start = afterLetter ? LETTER_INDEX.indexOf(afterLetter.toUpperCase()) : -1;
+  for (let i = start + 1; i < LETTER_INDEX.length; i++) {
+    const letter = LETTER_INDEX[i]!;
+    if (!used.has(letter)) return letter;
+  }
+  for (let i = 0; i < LETTER_INDEX.length; i++) {
+    const letter = LETTER_INDEX[i]!;
+    if (!used.has(letter)) return letter;
+  }
+  return null;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -102,6 +119,7 @@ function Index() {
     const clean = name.trim();
     if (!clean) return;
     let dupIndex = 0;
+    let assignedLetter: string | null = null;
     mutate((d) => {
       const cat = d.categories.find((c) => c.id === catId);
       if (!cat) return;
@@ -118,15 +136,16 @@ function Index() {
       // Duplicates of the same gear usually share the same spec sheet —
       // prefill it so the user only tweaks what differs.
       if (source?.details) next.details = { ...source.details };
+      // Auto-assign the next available alphabetical index (A→B→C…) per category.
+      next.letterIndex = nextLetterIndex(cat, source?.letterIndex);
+      assignedLetter = next.letterIndex;
       cat.items.push(next);
-
     });
     toast(
       dupIndex > 0
-        ? `${clean} added (#${dupIndex + 1}) — specs copied, editable`
-        : `${clean} added`,
+        ? `${clean} added (#${dupIndex + 1})${assignedLetter ? ` · index ${assignedLetter}` : ""} — specs copied, editable`
+        : `${clean} added${assignedLetter ? ` · index ${assignedLetter}` : ""}`,
     );
-
   };
 
 
