@@ -356,7 +356,6 @@ export function CategoryCard({
         onOpenChange={(o) => !o && setOpenItemId(null)}
         categoryName={cat.name}
         item={openItem}
-        providerOptions={contacts.map(contactLabel)}
         onPatch={(patch) => openItem && onDetails(openItem.id, patch)}
         onLetterIndex={(letter) => openItem && onLetterIndex(openItem.id, letter)}
       />
