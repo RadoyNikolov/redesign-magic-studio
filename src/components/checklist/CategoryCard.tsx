@@ -4,7 +4,12 @@ import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
 import { LetterBadge } from "./LetterIndexSelect";
 import { ItemDetailsDialog } from "./ItemDetailsDialog";
-import { detailSummary, fieldsForCategory, type ItemDetails } from "@/lib/item-fields";
+import {
+  detailSummary,
+  fieldsForCategory,
+  hasFieldSchema,
+  type ItemDetails,
+} from "@/lib/item-fields";
 import { formatDateRange } from "@/lib/dates";
 
 type Props = {
