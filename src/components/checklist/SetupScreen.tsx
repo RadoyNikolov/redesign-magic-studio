@@ -26,6 +26,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const [calField, setCalField] = useState<DateField | null>(null);
   const pickStart = useRef<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [rentalOpen, setRentalOpen] = useState(false);
   const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
   const p = state.project;
 
@@ -201,30 +202,81 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               {index === 0 && c.role === "Production Company / Rental" ? (
                 <>
                   <span className="slate-label">{c.role}</span>
-                  <input
-                    className={inputCls}
-                    placeholder="Name"
-                    value={c.name}
-                    list={`rental-companies-${c.id}`}
-                    onChange={(e) => {
-                      const name = e.target.value;
-                      const company = p.rentalCompanies.find((rc) => rc.name === name);
-                      mutate((d) => {
-                        const t = d.project.contacts.find((x) => x.id === c.id);
-                        if (!t) return;
-                        t.name = name;
-                        if (company) {
-                          t.email = company.email;
-                          t.phone = company.phone;
-                        }
-                      });
-                    }}
-                  />
-                  <datalist id={`rental-companies-${c.id}`}>
-                    {p.rentalCompanies.map((rc) => (
-                      <option key={rc.id} value={rc.name} />
-                    ))}
-                  </datalist>
+                  <div className="relative">
+                    <input
+                      className={`${inputCls} pr-8`}
+                      placeholder="Name"
+                      value={c.name}
+                      onChange={(e) => {
+                        const name = e.target.value;
+                        const company = p.rentalCompanies.find((rc) => rc.name === name);
+                        mutate((d) => {
+                          const t = d.project.contacts.find((x) => x.id === c.id);
+                          if (!t) return;
+                          t.name = name;
+                          if (company) {
+                            t.email = company.email;
+                            t.phone = company.phone;
+                          }
+                        });
+                      }}
+                      onFocus={() => setRentalOpen(true)}
+                      onBlur={() => window.setTimeout(() => setRentalOpen(false), 150)}
+                    />
+                    <button
+                      type="button"
+                      aria-label="Show rental companies"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setRentalOpen((v) => !v);
+                      }}
+                    >
+                      ▾
+                    </button>
+                    {rentalOpen && p.rentalCompanies.length > 0 && (
+                      <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-md border border-border bg-elevated shadow-panel">
+                        {p.rentalCompanies.map((rc) => (
+                          <button
+                            key={rc.id}
+                            type="button"
+                            className="block w-full px-3 py-2 text-left text-sm text-foreground hover:bg-card"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              mutate((d) => {
+                                const t = d.project.contacts.find((x) => x.id === c.id);
+                                if (!t) return;
+                                t.name = rc.name;
+                                t.email = rc.email;
+                                t.phone = rc.phone;
+                              });
+                              setRentalOpen(false);
+                            }}
+                          >
+                            {rc.name}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          className="block w-full border-t border-border px-3 py-2 text-left text-xs text-muted-foreground hover:bg-card"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            mutate((d) => {
+                              const t = d.project.contacts.find((x) => x.id === c.id);
+                              if (!t) return;
+                              t.name = "";
+                              t.email = "";
+                              t.phone = "";
+                            });
+                            setRentalOpen(false);
+                          }}
+                        >
+                          Clear / none
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   <input
                     className={inputCls}
                     placeholder="Email"
