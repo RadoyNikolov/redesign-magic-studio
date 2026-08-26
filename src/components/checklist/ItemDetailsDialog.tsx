@@ -24,7 +24,12 @@ import { LetterIndexSelect } from "./LetterIndexSelect";
 import type { Contact, Item } from "@/lib/checklist-store";
 import { formatDateRange } from "@/lib/dates";
 import { isoDate, parseIso } from "@/lib/dates";
-import { fieldsForCategory, resolveOptions, type ItemDetails } from "@/lib/item-fields";
+import {
+  fieldsForCategory,
+  providerLabel,
+  resolveOptions,
+  type ItemDetails,
+} from "@/lib/item-fields";
 
 const NONE = "__none__";
 
