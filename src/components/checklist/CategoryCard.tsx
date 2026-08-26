@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
