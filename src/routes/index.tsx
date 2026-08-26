@@ -105,16 +105,28 @@ function Index() {
     mutate((d) => {
       const cat = d.categories.find((c) => c.id === catId);
       if (!cat) return;
-      dupIndex = cat.items.filter((x) => x.name.toLowerCase() === clean.toLowerCase()).length;
-      cat.items.push({
+      const twins = cat.items.filter((x) => x.name.toLowerCase() === clean.toLowerCase());
+      dupIndex = twins.length;
+      const source = twins[twins.length - 1];
+      const next: Item = {
         id: uid(),
         name: clean,
         qty: 1,
-        status: null,
+        status: source?.status ?? null,
         group: group ?? null,
-      });
+      };
+      // Duplicates of the same gear usually share the same spec sheet —
+      // prefill it so the user only tweaks what differs.
+      if (source?.details) next.details = { ...source.details };
+      cat.items.push(next);
+
     });
-    toast(dupIndex > 0 ? `${clean} added (#${dupIndex + 1})` : `${clean} added`);
+    toast(
+      dupIndex > 0
+        ? `${clean} added (#${dupIndex + 1}) — specs copied, editable`
+        : `${clean} added`,
+    );
+
   };
 
 
