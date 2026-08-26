@@ -29,7 +29,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const pickStart = useRef<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [archiveForm, setArchiveForm] = useState({ name: "", email: "", phone: "" });
-  const rentalSelectRef = useRef<HTMLSelectElement | null>(null);
+  const [rentalPick, setRentalPick] = useState("");
   const p = state.project;
 
   const applyRentalCompany = (contactId: string, companyId: string) => {
