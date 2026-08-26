@@ -1,9 +1,11 @@
+import { useState } from "react";
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
-import { LETTER_INDEX, getLetterColor } from "@/lib/letter-index";
-import { cn } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { AddRow } from "./AddRow";
+import { LetterBadge, LetterIndexSelect } from "./LetterIndexSelect";
+import { ItemDetailsDialog } from "./ItemDetailsDialog";
+import { detailSummary, fieldsForCategory, type ItemDetails } from "@/lib/item-fields";
+import { formatDateRange } from "@/lib/dates";
 
 type Props = {
   cat: Category;
@@ -12,12 +14,15 @@ type Props = {
   showAddRow: boolean;
   collapsed: boolean;
   contacts: Contact[];
+  /** when false, private notes are hidden from the print/PDF output */
+  printPrivateNotes: boolean;
   onToggle: () => void;
   onDelete: () => void;
   onQty: (itemId: string, delta: number) => void;
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onAssign: (itemId: string, contactId: string | null) => void;
   onLetterIndex: (itemId: string, letter: string | null) => void;
+  onDetails: (itemId: string, patch: ItemDetails) => void;
   onRemoveItem: (itemId: string) => void;
   onAdd: (name: string, qty: number, group?: string | null, assigneeId?: string | null) => void;
   onAddFamily: (
@@ -42,19 +47,6 @@ const STATUS_ACCENT: Record<string, string> = {
   tbc: "border-l-tbc",
 };
 
-function LetterBadge({ letter }: { letter: string }) {
-  const { bg, text } = getLetterColor(letter);
-  return (
-    <span
-      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold leading-none"
-      style={{ backgroundColor: bg, color: text }}
-      title={`Index ${letter}`}
-    >
-      {letter}
-    </span>
-  );
-}
-
 export function CategoryCard({
   cat,
   color,
@@ -62,16 +54,21 @@ export function CategoryCard({
   showAddRow,
   collapsed,
   contacts,
+  printPrivateNotes,
   onToggle,
   onDelete,
   onQty,
   onStatus,
   onAssign,
   onLetterIndex,
+  onDetails,
   onRemoveItem,
   onAdd,
   onAddFamily,
 }: Props) {
+  const [openItemId, setOpenItemId] = useState<string | null>(null);
+  const openItem = cat.items.find((i) => i.id === openItemId) ?? null;
+
   const cHave = cat.items.filter((i) => i.status === "have").length;
   const cLook = cat.items.filter((i) => i.status === "looking").length;
   const cTbc = cat.items.filter((i) => i.status === "tbc").length;
@@ -86,6 +83,8 @@ export function CategoryCard({
   });
   const groupNames = [...grouped.keys()].sort((a, b) => a.localeCompare(b));
 
+  const fields = fieldsForCategory(cat.name);
+
   const renderItem = (it: Item) => {
     const assigned = contacts.find((c) => c.id === it.assigneeId);
     const statusText =
@@ -97,6 +96,17 @@ export function CategoryCard({
             ? "TBC"
             : "—";
 
+    const details = it.details ?? {};
+    const chips = detailSummary(details);
+    const rentalText = details.rental?.start
+      ? formatDateRange({ start: details.rental.start, end: details.rental.end })
+      : "";
+
+    const printRows = fields
+      .filter((f) => (f.private ? printPrivateNotes : true))
+      .map((f) => ({ label: f.label, value: (details[f.key] as string | null) ?? "" }))
+      .filter((r) => r.value.trim());
+
     return (
       <div
         key={it.id}
@@ -105,7 +115,7 @@ export function CategoryCard({
         }`}
       >
         {/* Quantity — screen controls or print value */}
-        <div className="row-span-2 flex flex-col justify-start gap-2 pt-0.5">
+        <div className="row-span-3 flex flex-col justify-start gap-2 pt-0.5">
           <span className="no-print flex shrink-0 items-center gap-1">
             <button
               type="button"
@@ -132,7 +142,14 @@ export function CategoryCard({
         {/* Top row: index badge + name + print info + remove */}
         <div className="flex items-center gap-3">
           {it.letterIndex && <LetterBadge letter={it.letterIndex} />}
-          <span className="min-w-0 flex-1 text-sm leading-snug text-foreground">{it.name}</span>
+          <button
+            type="button"
+            onClick={() => setOpenItemId(it.id)}
+            title="Open item details"
+            className="min-w-0 flex-1 text-left text-sm leading-snug text-foreground transition-colors hover:text-primary"
+          >
+            {it.name}
+          </button>
           <span className="hidden shrink-0 font-mono text-[10px] uppercase print:inline">
             {assigned ? contactLabel(assigned) : "—"} · {statusText}
           </span>
@@ -146,6 +163,39 @@ export function CategoryCard({
             ✕
           </button>
         </div>
+
+        {/* Detail chips (screen) */}
+        {(chips.length > 0 || rentalText) && (
+          <div className="no-print flex flex-wrap items-center gap-1.5">
+            {chips.map((c) => (
+              <span
+                key={c}
+                className="rounded border border-border/70 bg-elevated px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"
+              >
+                {c}
+              </span>
+            ))}
+            {rentalText && (
+              <span className="rounded border border-border/70 bg-elevated px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                {rentalText}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Detail lines (print) */}
+        {(printRows.length > 0 || rentalText) && (
+          <div className="hidden print:block">
+            {rentalText && (
+              <p className="font-mono text-[10px] leading-snug">Dates: {rentalText}</p>
+            )}
+            {printRows.map((r) => (
+              <p key={r.label} className="font-mono text-[10px] leading-snug">
+                {r.label}: {r.value}
+              </p>
+            ))}
+          </div>
+        )}
 
         {/* Bottom row: assignee, status, index dropdown */}
         <div className="no-print flex flex-wrap items-center gap-2">
@@ -185,40 +235,19 @@ export function CategoryCard({
             ))}
           </span>
 
-          <Select
-            value={it.letterIndex ?? ""}
-            onValueChange={(v) => onLetterIndex(it.id, v || null)}
+          <LetterIndexSelect
+            value={it.letterIndex}
+            onChange={(letter) => onLetterIndex(it.id, letter)}
+          />
+
+          <button
+            type="button"
+            onClick={() => setOpenItemId(it.id)}
+            title="Open item details"
+            className="rounded border border-border bg-elevated px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
           >
-            <SelectTrigger
-              className={cn(
-                "h-7 w-auto min-w-[6rem] border bg-elevated px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em]",
-                it.letterIndex
-                  ? "border-primary/60 text-primary"
-                  : "border-border text-muted-foreground hover:text-foreground",
-              )}
-              aria-label="Assign alphabetical index"
-              title="Assign an alphabetical index to this item"
-            >
-              <div className="flex items-center gap-2">
-                {it.letterIndex ? (
-                  <LetterBadge letter={it.letterIndex} />
-                ) : (
-                  <span>◇ Index</span>
-                )}
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="" className="py-1 pl-2 pr-6 text-xs">
-                <span className="text-muted-foreground">◇ Index</span>
-              </SelectItem>
-              {LETTER_INDEX.map((letter) => (
-                <SelectItem key={letter} value={letter} className="py-1 pl-2 pr-6 text-xs">
-                  <LetterBadge letter={letter} />
-                  <span className="sr-only">{letter}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            ⚙ Details
+          </button>
         </div>
       </div>
     );
@@ -299,6 +328,15 @@ export function CategoryCard({
           {showAddRow && <AddRow cat={cat} onAdd={onAdd} onAddFamily={onAddFamily} />}
         </div>
       )}
+
+      <ItemDetailsDialog
+        open={!!openItem}
+        onOpenChange={(o) => !o && setOpenItemId(null)}
+        categoryName={cat.name}
+        item={openItem}
+        onPatch={(patch) => openItem && onDetails(openItem.id, patch)}
+        onLetterIndex={(letter) => openItem && onLetterIndex(openItem.id, letter)}
+      />
     </section>
   );
 }
