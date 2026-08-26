@@ -113,10 +113,11 @@ export function CategoryCard({
     const m = i.details?.lensMount;
     if (m) mountCounts.set(m, (mountCounts.get(m) || 0) + 1);
   });
-  const dominantMount =
-    mountCounts.size > 0
-      ? [...mountCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0][0]
-      : null;
+  const sortedMounts = [...mountCounts.entries()].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+  );
+  const dominantMount = sortedMounts[0]?.[0] ?? null;
+
 
 
 
