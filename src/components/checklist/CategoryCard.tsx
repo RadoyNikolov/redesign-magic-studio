@@ -115,7 +115,7 @@ export function CategoryCard({
         }`}
       >
         {/* Quantity — screen controls or print value */}
-        <div className="row-span-3 flex flex-col justify-start gap-2 pt-0.5">
+        <div className="row-span-full flex flex-col justify-start gap-2 pt-0.5">
           <span className="no-print flex shrink-0 items-center gap-1">
             <button
               type="button"
