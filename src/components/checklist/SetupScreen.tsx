@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { DateField, RentalCompany, State } from "@/lib/checklist-store";
+import type { DateField, State } from "@/lib/checklist-store";
 import { uid } from "@/data/gear";
 import { fieldLabel, formatDateRange } from "@/lib/dates";
 import { DateRangeCalendar } from "./DateRangeCalendar";
