@@ -218,10 +218,10 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                   <span className="slate-label">{c.role}</span>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1.2fr_1.2fr_0.9fr_auto]">
                     <select
-                      ref={rentalSelectRef}
-                      defaultValue=""
+                      value={rentalPick}
                       onChange={(e) => {
-                        if (e.target.value) applyRentalCompany(c.id, e.target.value);
+                        const id = e.target.value;
+                        if (id) applyRentalCompany(c.id, id);
                       }}
                       className={RENTAL_SELECT_CLS}
                     >
