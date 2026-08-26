@@ -46,11 +46,14 @@ function fromDate(d?: Date) {
   return d ? isoDate(d.getFullYear(), d.getMonth(), d.getDate()) : "";
 }
 
+const contactLabel = (c: Contact) => c.name?.trim() || c.role?.trim() || "Unnamed";
+
 export function ItemDetailsDialog({
   open,
   onOpenChange,
   categoryName,
   item,
+  contacts,
   onPatch,
   onLetterIndex,
 }: Props) {
