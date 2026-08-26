@@ -24,7 +24,7 @@ type Props = {
   printPrivateNotes: boolean;
   onToggle: () => void;
   onDelete: () => void;
-  onQty: (itemId: string, delta: number) => void;
+  onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onStatus: (itemId: string, status: Exclude<Status, null>) => void;
   onAssign: (itemId: string, contactId: string | null) => void;
   onLetterIndex: (itemId: string, letter: string | null) => void;
@@ -63,7 +63,6 @@ export function CategoryCard({
   printPrivateNotes,
   onToggle,
   onDelete,
-  onQty,
   onStatus,
   onAssign,
   onLetterIndex,
@@ -145,30 +144,14 @@ export function CategoryCard({
           it.status ? STATUS_ACCENT[it.status] : "border-l-transparent"
         }`}
       >
-        {/* Top row: quantity + index badge + name + print info + remove */}
+        {/* Top row: index badge + name + remove */}
         <div className="flex items-start gap-2">
-          <span className="no-print flex shrink-0 items-center gap-1 pt-0.5">
-            <button
-              type="button"
-              title="Decrease quantity"
-              disabled={it.qty <= 1}
-              onClick={() => onQty(it.id, -1)}
-              className="size-6 rounded border border-border text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
-            >
-              −
-            </button>
-            <span className="w-8 text-center font-mono text-xs text-foreground">{it.qty}×</span>
-            <button
-              type="button"
-              title="Increase quantity"
-              onClick={() => onQty(it.id, 1)}
-              className="size-6 rounded border border-border text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              +
-            </button>
-          </span>
-          <span className="hidden font-mono text-xs print:inline">{it.qty} ×</span>
           {it.letterIndex && (
+            <span className="pt-0.5">
+              <LetterBadge letter={it.letterIndex} />
+            </span>
+          )}
+          <button
             <span className="pt-0.5">
               <LetterBadge letter={it.letterIndex} />
             </span>
