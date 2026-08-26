@@ -347,7 +347,7 @@ export function CategoryCard({
           ))}
           <div className="divide-y divide-border/40">{ungrouped.map(renderItem)}</div>
 
-          {showAddRow && <AddRow cat={cat} onAdd={onAdd} onAddFamily={onAddFamily} />}
+          {showAddRow && <AddRow cat={cat} onAdd={handleAdd} onAddFamily={onAddFamily} />}
         </div>
       )}
 
