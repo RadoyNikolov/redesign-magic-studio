@@ -220,7 +220,6 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                     <select
                       value={rentalPick}
                       onChange={(e) => {
-                        console.log("onChange fired", e.target.value, c.id);
                         const id = e.target.value;
                         if (id) applyRentalCompany(c.id, id);
                       }}
@@ -233,16 +232,6 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                         </option>
                       ))}
                     </select>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        console.log("TEST button clicked", c.id, p.rentalCompanies[0]?.id);
-                        applyRentalCompany(c.id, p.rentalCompanies[0]?.id || "");
-                      }}
-                      className="rounded-md border border-border px-2 py-1 text-xs text-primary"
-                    >
-                      TEST
-                    </button>
                     <input
                       className={inputCls}
                       placeholder="Name"
