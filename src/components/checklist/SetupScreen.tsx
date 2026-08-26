@@ -216,7 +216,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               {index === 0 && c.role === "Production Company / Rental" ? (
                 <div className="flex flex-col gap-1.5 sm:col-span-4">
                   <span className="slate-label">{c.role}</span>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1.2fr_1.2fr_0.9fr_auto]">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1.2fr_1fr_1.2fr_0.9fr_auto]">
                     <select
                       value={rentalPick}
                       onChange={(e) => {
