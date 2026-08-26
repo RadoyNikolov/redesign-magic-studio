@@ -151,6 +151,12 @@ export function loadState(): State {
         if (!Array.isArray(d.project.rentalCompanies) || d.project.rentalCompanies.length === 0) {
           d.project.rentalCompanies = DEFAULT_RENTAL_COMPANIES.map((c) => ({ ...c }));
         }
+        if (Array.isArray(d.project.contacts)) {
+          d.project.contacts.forEach((contact: Contact) => {
+            const renamed = ROLE_RENAMES[contact.role];
+            if (renamed) contact.role = renamed;
+          });
+        }
         d.categories.forEach((c: Category) => {
           const renamed = RENAMES[c.name];
           if (renamed) c.name = renamed;
