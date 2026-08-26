@@ -141,6 +141,9 @@ export function loadState(): State {
               : { start: "", end: "" };
         });
         if (d.view === undefined) d.view = "checklist";
+        if (!Array.isArray(d.project.rentalCompanies) || d.project.rentalCompanies.length === 0) {
+          d.project.rentalCompanies = DEFAULT_RENTAL_COMPANIES.map((c) => ({ ...c }));
+        }
         d.categories.forEach((c: Category) => {
           const renamed = RENAMES[c.name];
           if (renamed) c.name = renamed;
