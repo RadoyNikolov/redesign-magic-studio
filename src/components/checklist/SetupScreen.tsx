@@ -233,6 +233,13 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                         </option>
                       ))}
                     </select>
+                    <button
+                      type="button"
+                      onClick={() => applyRentalCompany(c.id, p.rentalCompanies[0]?.id || "")}
+                      className="rounded-md border border-border px-2 py-1 text-xs text-primary"
+                    >
+                      TEST
+                    </button>
                     <input
                       className={inputCls}
                       placeholder="Name"
