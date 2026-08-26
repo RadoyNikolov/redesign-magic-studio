@@ -59,12 +59,11 @@ function Index() {
       <SetupScreen
         state={state}
         mutate={mutate}
-        onContinue={() => {
-          console.log("onContinue called");
+        onContinue={() =>
           mutate((d) => {
             d.view = "checklist";
-          });
-        }}
+          })
+        }
       />
     );
   }
