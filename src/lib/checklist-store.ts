@@ -65,12 +65,12 @@ export type State = {
 };
 
 export const DEFAULT_ROLES = [
-  "Production Company / Rental",
+  "Main Rental",
   "Producer",
   "Line Producer",
-  "Director of Photography",
-  "1st Assistant Camera",
-  "2nd Assistant Camera",
+  "DoP",
+  "1st AC",
+  "2nd AC",
   "DIT",
 ];
 
@@ -125,6 +125,13 @@ const RENAMES: Record<string, string> = {
   "Media & Data": "Data",
 };
 
+const ROLE_RENAMES: Record<string, string> = {
+  "Production Company / Rental": "Main Rental",
+  "Director of Photography": "DoP",
+  "1st Assistant Camera": "1st AC",
+  "2nd Assistant Camera": "2nd AC",
+};
+
 export function loadState(): State {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -143,6 +150,12 @@ export function loadState(): State {
         if (d.view === undefined) d.view = "checklist";
         if (!Array.isArray(d.project.rentalCompanies) || d.project.rentalCompanies.length === 0) {
           d.project.rentalCompanies = DEFAULT_RENTAL_COMPANIES.map((c) => ({ ...c }));
+        }
+        if (Array.isArray(d.project.contacts)) {
+          d.project.contacts.forEach((contact: Contact) => {
+            const renamed = ROLE_RENAMES[contact.role];
+            if (renamed) contact.role = renamed;
+          });
         }
         d.categories.forEach((c: Category) => {
           const renamed = RENAMES[c.name];
