@@ -74,6 +74,28 @@ export function CategoryCard({
   const [openItemId, setOpenItemId] = useState<string | null>(null);
   const openItem = cat.items.find((i) => i.id === openItemId) ?? null;
 
+  // When a new item is picked from the suggestions, open its spec sheet right away.
+  const autoOpenName = useRef<string | null>(null);
+  const knownIds = useRef<Set<string>>(new Set(cat.items.map((i) => i.id)));
+
+  useEffect(() => {
+    const fresh = cat.items.filter((i) => !knownIds.current.has(i.id));
+    knownIds.current = new Set(cat.items.map((i) => i.id));
+    if (!autoOpenName.current) return;
+    const target =
+      fresh.find((i) => i.name === autoOpenName.current) ?? (fresh.length === 1 ? fresh[0] : null);
+    if (target) {
+      autoOpenName.current = null;
+      setOpenItemId(target.id);
+    }
+  }, [cat.items]);
+
+  const handleAdd: Props["onAdd"] = (name, qty, group, assigneeId) => {
+    if (hasFieldSchema(cat.name)) autoOpenName.current = name;
+    onAdd(name, qty, group, assigneeId);
+  };
+
+
   const cHave = cat.items.filter((i) => i.status === "have").length;
   const cLook = cat.items.filter((i) => i.status === "looking").length;
   const cTbc = cat.items.filter((i) => i.status === "tbc").length;
