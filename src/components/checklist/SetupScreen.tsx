@@ -257,7 +257,10 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
 
       <button
         type="button"
-        onClick={onContinue}
+        onClick={() => {
+          window.alert("continue");
+          onContinue();
+        }}
         className="mt-6 w-full rounded-lg bg-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-primary-foreground transition-transform hover:-translate-y-px sm:w-auto"
       >
         Continue to checklist →
