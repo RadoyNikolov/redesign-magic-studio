@@ -125,6 +125,13 @@ const RENAMES: Record<string, string> = {
   "Media & Data": "Data",
 };
 
+const ROLE_RENAMES: Record<string, string> = {
+  "Production Company / Rental": "Main Rental",
+  "Director of Photography": "DoP",
+  "1st Assistant Camera": "1st AC",
+  "2nd Assistant Camera": "2nd AC",
+};
+
 export function loadState(): State {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
