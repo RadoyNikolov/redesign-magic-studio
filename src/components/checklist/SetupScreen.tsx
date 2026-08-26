@@ -249,10 +249,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                       type="button"
                       aria-label="Show rental companies"
                       className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setRentalOpenId((id) => (id === c.id ? null : c.id));
-                      }}
+                      onClick={() => setRentalOpenId((id) => (id === c.id ? null : c.id))}
                     >
                       ▾
                     </button>
