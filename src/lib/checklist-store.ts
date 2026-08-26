@@ -74,6 +74,13 @@ export const DEFAULT_ROLES = [
   "DIT",
 ];
 
+export const DEFAULT_RENTAL_COMPANIES: RentalCompany[] = [
+  { id: uid(), name: "Nu Boyana Film Studios", email: "office@b2yproductions.com", phone: "+359888550124" },
+  { id: uid(), name: "B2Y Productions", email: "office@b2yproductions.com", phone: "+359888550124" },
+  { id: uid(), name: "Magic Shop", email: "office@magicshoprental.com", phone: "+359 896 482 295" },
+  { id: uid(), name: "Pro Camera", email: "rental@procamera.bg", phone: "+359 87 929 1110" },
+];
+
 function defaultData(): State {
   return {
     view: "setup",
@@ -91,6 +98,7 @@ function defaultData(): State {
         email: "",
         phone: "",
       })),
+      rentalCompanies: DEFAULT_RENTAL_COMPANIES.map((c) => ({ ...c })),
     },
     categories: Object.keys(GEAR).map((name) => ({
       id: uid(),
