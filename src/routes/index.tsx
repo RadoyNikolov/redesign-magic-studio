@@ -108,16 +108,18 @@ function Index() {
       const twins = cat.items.filter((x) => x.name.toLowerCase() === clean.toLowerCase());
       dupIndex = twins.length;
       const source = twins[twins.length - 1];
-      cat.items.push({
+      const next: Item = {
         id: uid(),
         name: clean,
         qty: 1,
         status: source?.status ?? null,
         group: group ?? null,
-        // Duplicates of the same gear usually share the same spec sheet —
-        // prefill it so the user only tweaks what differs.
-        details: source?.details ? { ...source.details } : undefined,
-      });
+      };
+      // Duplicates of the same gear usually share the same spec sheet —
+      // prefill it so the user only tweaks what differs.
+      if (source?.details) next.details = { ...source.details };
+      cat.items.push(next);
+
     });
     toast(
       dupIndex > 0
