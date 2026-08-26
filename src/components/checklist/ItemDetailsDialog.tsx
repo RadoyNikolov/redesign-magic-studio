@@ -8,7 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
@@ -84,9 +90,7 @@ export function ItemDetailsDialog({
             {...(rental?.start ? { defaultMonth: parseIso(rental.start) } : {})}
             onSelect={(r) =>
               onPatch({
-                rental: r?.from
-                  ? { start: fromDate(r.from), end: fromDate(r.to ?? r.from) }
-                  : null,
+                rental: r?.from ? { start: fromDate(r.from), end: fromDate(r.to ?? r.from) } : null,
               })
             }
             className="pointer-events-auto p-3"
@@ -141,9 +145,7 @@ export function ItemDetailsDialog({
               ) : isSelect && options && options.length > 0 ? (
                 <Select
                   value={value || NONE}
-                  onValueChange={(v) =>
-                    onPatch({ [f.key]: v === NONE ? null : v } as ItemDetails)
-                  }
+                  onValueChange={(v) => onPatch({ [f.key]: v === NONE ? null : v } as ItemDetails)}
                 >
                   <SelectTrigger className="mt-1.5 w-full bg-elevated text-sm">
                     <SelectValue placeholder="—" />

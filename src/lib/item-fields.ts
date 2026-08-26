@@ -29,14 +29,7 @@ export type FieldDef = {
 
 /* ---------- Recording codecs per camera brand ---------- */
 export const CODECS_BY_BRAND: Record<string, string[]> = {
-  ARRI: [
-    "ARRIRAW",
-    "ProRes 4444XQ",
-    "ProRes 4444",
-    "ProRes 422HQ",
-    "ProRes 422",
-    "ProRes 422LT",
-  ],
+  ARRI: ["ARRIRAW", "ProRes 4444XQ", "ProRes 4444", "ProRes 422HQ", "ProRes 422", "ProRes 422LT"],
   Sony: ["X-OCN XT", "X-OCN ST", "X-OCN LT", "ProRes 4444XQ", "ProRes 4444", "ProRes 422XQ"],
   RED: ["REDCODE HQ", "REDCODE MQ", "REDCODE LQ", "REDCODE ELQ"],
 };

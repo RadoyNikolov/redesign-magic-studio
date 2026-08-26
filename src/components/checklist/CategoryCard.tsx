@@ -95,7 +95,6 @@ export function CategoryCard({
     onAdd(name, qty, group, assigneeId);
   };
 
-
   const cHave = cat.items.filter((i) => i.status === "have").length;
   const cLook = cat.items.filter((i) => i.status === "looking").length;
   const cTbc = cat.items.filter((i) => i.status === "tbc").length;
