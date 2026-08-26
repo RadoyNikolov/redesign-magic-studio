@@ -24,7 +24,12 @@ import { LetterIndexSelect } from "./LetterIndexSelect";
 import type { Contact, Item } from "@/lib/checklist-store";
 import { formatDateRange } from "@/lib/dates";
 import { isoDate, parseIso } from "@/lib/dates";
-import { fieldsForCategory, resolveOptions, type ItemDetails } from "@/lib/item-fields";
+import {
+  fieldsForCategory,
+  providerLabel,
+  resolveOptions,
+  type ItemDetails,
+} from "@/lib/item-fields";
 
 const NONE = "__none__";
 
@@ -148,22 +153,30 @@ export function ItemDetailsDialog({
                   className="mt-1.5 bg-elevated text-sm"
                 />
               ) : isProvider ? (
-                <Select
-                  value={value || NONE}
-                  onValueChange={(v) => onPatch({ provider: v === NONE ? null : v })}
-                >
-                  <SelectTrigger className="mt-1.5 w-full bg-elevated text-sm">
-                    <SelectValue placeholder="—" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE}>—</SelectItem>
-                    {contacts.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {contactLabel(c)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <>
+                  <Select
+                    value={value || NONE}
+                    onValueChange={(v) => onPatch({ provider: v === NONE ? null : v })}
+                  >
+                    <SelectTrigger className="mt-1.5 w-full bg-elevated text-sm">
+                      <SelectValue placeholder="—" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE}>—</SelectItem>
+                      {contacts.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {contactLabel(c)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {value && (
+                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+                      Selected provider: {" "}
+                      <span className="text-foreground">{providerLabel(value, contacts)}</span>
+                    </p>
+                  )}
+                </>
               ) : isSelect && options && options.length > 0 ? (
                 <Select
                   value={value || NONE}

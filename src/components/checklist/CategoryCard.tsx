@@ -8,6 +8,7 @@ import {
   detailSummary,
   fieldsForCategory,
   hasFieldSchema,
+  providerLabel,
   type ItemDetails,
 } from "@/lib/item-fields";
 import { formatDateRange } from "@/lib/dates";
@@ -123,14 +124,18 @@ export function CategoryCard({
             : "—";
 
     const details = it.details ?? {};
-    const chips = detailSummary(details);
+    const chips = detailSummary(details, contacts);
     const rentalText = details.rental?.start
       ? formatDateRange({ start: details.rental.start, end: details.rental.end })
       : "";
 
     const printRows = fields
       .filter((f) => (f.private ? printPrivateNotes : true))
-      .map((f) => ({ label: f.label, value: (details[f.key] as string | null) ?? "" }))
+      .map((f) => {
+        const raw = (details[f.key] as string | null) ?? "";
+        const value = f.key === "provider" ? providerLabel(raw, contacts) ?? "" : raw;
+        return { label: f.label, value };
+      })
       .filter((r) => r.value.trim());
 
     return (
