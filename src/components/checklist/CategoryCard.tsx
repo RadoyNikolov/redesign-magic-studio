@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
-import { LetterBadge, LetterIndexSelect } from "./LetterIndexSelect";
+import { LetterBadge } from "./LetterIndexSelect";
 import { ItemDetailsDialog } from "./ItemDetailsDialog";
 import { detailSummary, fieldsForCategory, type ItemDetails } from "@/lib/item-fields";
 import { formatDateRange } from "@/lib/dates";
@@ -235,11 +235,6 @@ export function CategoryCard({
             ))}
           </span>
 
-          <LetterIndexSelect
-            value={it.letterIndex}
-            onChange={(letter) => onLetterIndex(it.id, letter)}
-          />
-
           <button
             type="button"
             onClick={() => setOpenItemId(it.id)}
@@ -334,6 +329,7 @@ export function CategoryCard({
         onOpenChange={(o) => !o && setOpenItemId(null)}
         categoryName={cat.name}
         item={openItem}
+        providerOptions={contacts.map(contactLabel)}
         onPatch={(patch) => openItem && onDetails(openItem.id, patch)}
         onLetterIndex={(letter) => openItem && onLetterIndex(openItem.id, letter)}
       />

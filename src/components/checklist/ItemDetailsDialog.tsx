@@ -27,6 +27,8 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   categoryName: string;
   item: Item | null;
+  /** crew members from the project setup, offered as Provider options */
+  providerOptions?: string[];
   onPatch: (patch: ItemDetails) => void;
   onLetterIndex: (letter: string | null) => void;
 };
@@ -44,6 +46,7 @@ export function ItemDetailsDialog({
   onOpenChange,
   categoryName,
   item,
+  providerOptions,
   onPatch,
   onLetterIndex,
 }: Props) {
@@ -127,7 +130,11 @@ export function ItemDetailsDialog({
 
           {fields.map((f) => {
             const value = (details[f.key] as string | null | undefined) ?? "";
-            const options = resolveOptions(f, item.name);
+            const options =
+              f.key === "provider" && providerOptions && providerOptions.length > 0
+                ? providerOptions
+                : resolveOptions(f, item.name);
+            const isSelect = f.kind === "select" || (f.key === "provider" && !!options?.length);
             const node =
               f.kind === "textarea" ? (
                 <Textarea
@@ -137,7 +144,7 @@ export function ItemDetailsDialog({
                   onChange={(e) => onPatch({ [f.key]: e.target.value } as ItemDetails)}
                   className="mt-1.5 bg-elevated text-sm"
                 />
-              ) : f.kind === "select" && options && options.length > 0 ? (
+              ) : isSelect && options && options.length > 0 ? (
                 <Select
                   value={value || NONE}
                   onValueChange={(v) =>
