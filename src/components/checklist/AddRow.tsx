@@ -7,8 +7,8 @@ type Flat = { name: string; qty: number; cat: string; group: string | null };
 
 type Props = {
   cat: Category;
-  onAdd: (name: string, qty: number, group?: string | null) => void;
-  onAddFamily: (family: Family, selectedIdx: number[], qty: number) => void;
+  onAdd: (name: string, group?: string | null) => void;
+  onAddFamily: (family: Family, selectedIdx: number[]) => void;
 };
 
 type Mode = "closed" | "search" | "browseCats" | "browseItems" | "picker";
@@ -47,7 +47,6 @@ const chevronCls =
 
 export function AddRow({ cat, onAdd, onAddFamily }: Props) {
   const [q, setQ] = useState("");
-  const [qty, setQty] = useState(1);
   const [mode, setMode] = useState<Mode>("closed");
   const [sel, setSel] = useState(-1);
   const [family, setFamily] = useState<Family | null>(null);
@@ -94,8 +93,8 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     setMode("picker");
   };
 
-  const addFlat = (name: string, itemQty: number, group?: string | null) => {
-    onAdd(name, Math.max(1, itemQty || 1), group ?? null);
+  const addFlat = (name: string, group?: string | null) => {
+    onAdd(name, group ?? null);
     setQ("");
     closeAll();
     inputRef.current?.focus();
@@ -108,7 +107,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
       closeAll();
       return;
     }
-    onAddFamily(family, [...checked], Math.max(1, qty || 1));
+    onAddFamily(family, [...checked]);
     setQ("");
     closeAll();
     inputRef.current?.focus();
@@ -151,14 +150,6 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
 
   return (
     <div className="no-print mt-2 flex items-center gap-2 border-t border-border/60 pt-3">
-      <input
-        type="number"
-        min={1}
-        value={qty}
-        onChange={(e) => setQty(parseInt(e.target.value) || 1)}
-        title="Quantity"
-        className="w-14 rounded-md border border-border bg-elevated px-2 py-2 text-center font-mono text-xs text-foreground focus:border-primary focus:outline-none"
-      />
       <div className="relative flex-1">
         <input
           ref={inputRef}
@@ -194,9 +185,9 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
               const res = sel >= 0 ? results[sel] : undefined;
               if (res) {
                 if (res.kind === "family") openPicker(res.family);
-                else addFlat(res.item.name, res.item.qty, res.item.group);
+                else addFlat(res.item.name, res.item.group);
               } else if (q.trim()) {
-                addFlat(q, qty);
+                addFlat(q);
               }
             } else if (e.key === "Escape") {
               closeAll();
@@ -242,7 +233,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                       type="button"
                       onMouseDown={(e) => {
                         stop(e);
-                        addFlat(res.item.name, res.item.qty, res.item.group);
+                        addFlat(res.item.name, res.item.group);
                       }}
                       className={`${rowCls} ${i === sel ? "bg-accent" : ""}`}
                     >
@@ -281,7 +272,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                             type="button"
                             onMouseDown={(e) => {
                               stop(e);
-                              addFlat(it.name, qty, src?.group ?? null);
+                              addFlat(it.name, src?.group ?? null);
                             }}
                             className={rowCls}
                           >
@@ -381,7 +372,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                           type="button"
                           onMouseDown={(e) => {
                             stop(e);
-                            addFlat(x.name, x.qty, x.group);
+                            addFlat(x.name, x.group);
                           }}
                           className={rowCls}
                         >
@@ -532,7 +523,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
       </button>
       <button
         type="button"
-        onClick={() => q.trim() && addFlat(q, qty)}
+        onClick={() => q.trim() && addFlat(q)}
         className="rounded-md bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground transition-opacity hover:opacity-90"
       >
         + Add
