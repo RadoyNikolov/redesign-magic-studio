@@ -345,14 +345,6 @@ function Index() {
                   toast("Category deleted");
                 }
               }}
-              onQty={(itemId, delta) =>
-                mutate((d) => {
-                  const t = d.categories
-                    .find((c) => c.id === cat.id)
-                    ?.items.find((i) => i.id === itemId);
-                  if (t && (delta > 0 || t.qty > 1)) t.qty += delta;
-                })
-              }
               onStatus={(itemId, status: Exclude<Status, null>) =>
                 mutate((d) => {
                   const t = d.categories
