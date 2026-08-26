@@ -29,13 +29,8 @@ type Props = {
   onLetterIndex: (itemId: string, letter: string | null) => void;
   onDetails: (itemId: string, patch: ItemDetails) => void;
   onRemoveItem: (itemId: string) => void;
-  onAdd: (name: string, qty: number, group?: string | null, assigneeId?: string | null) => void;
-  onAddFamily: (
-    family: Family,
-    selectedIdx: number[],
-    qty: number,
-    assigneeId?: string | null,
-  ) => void;
+  onAdd: (name: string, group?: string | null) => void;
+  onAddFamily: (family: Family, selectedIdx: number[]) => void;
 };
 
 const contactLabel = (c: Contact) => c.name?.trim() || c.role?.trim() || "Unnamed";
@@ -89,9 +84,9 @@ export function CategoryCard({
     }
   }, [cat.items]);
 
-  const handleAdd: Props["onAdd"] = (name, qty, group, assigneeId) => {
+  const handleAdd: Props["onAdd"] = (name, group) => {
     if (hasFieldSchema(cat.name)) autoOpenName.current = name;
-    onAdd(name, qty, group, assigneeId);
+    onAdd(name, group);
   };
 
   const cHave = cat.items.filter((i) => i.status === "have").length;

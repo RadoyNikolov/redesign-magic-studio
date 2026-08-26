@@ -98,7 +98,7 @@ function Index() {
     toast("Category added");
   };
 
-  const addItem = (catId: string, name: string, qty: number, group?: string | null) => {
+  const addItem = (catId: string, name: string, group?: string | null) => {
     const clean = name.trim();
     if (!clean) return;
     let message = "";
@@ -107,13 +107,13 @@ function Index() {
       if (!cat) return;
       const existing = cat.items.find((x) => x.name.toLowerCase() === clean.toLowerCase());
       if (existing) {
-        existing.qty += Math.max(1, qty || 1);
+        existing.qty += 1;
         message = `Quantity increased to ${existing.qty} ×`;
       } else {
         cat.items.push({
           id: uid(),
           name: clean,
-          qty: Math.max(1, qty || 1),
+          qty: 1,
           status: null,
           group: group ?? null,
         });
@@ -122,7 +122,7 @@ function Index() {
     if (message) toast(message);
   };
 
-  const addFamily = (catId: string, family: Family, selectedIdx: number[], qty: number) => {
+  const addFamily = (catId: string, family: Family, selectedIdx: number[]) => {
     // The picker opens with already-added focal lengths pre-checked, so whatever
     // is checked now is the row's full intended content.
     const newMm = selectedIdx
@@ -148,7 +148,7 @@ function Index() {
         cat.items.push({
           id: uid(),
           name: `${family.label} ${newMm.join(", ")}`,
-          qty,
+          qty: 1,
           status: null,
           group: family.group ?? null,
           familyKey: family.label,
@@ -359,8 +359,8 @@ function Index() {
                   if (t) t.items = t.items.filter((i) => i.id !== itemId);
                 })
               }
-              onAdd={(name, qty, group) => addItem(cat.id, name, qty, group)}
-              onAddFamily={(family, idx, qty) => addFamily(cat.id, family, idx, qty)}
+              onAdd={(name, group) => addItem(cat.id, name, group)}
+              onAddFamily={(family, idx) => addFamily(cat.id, family, idx)}
             />
           );
         })}
