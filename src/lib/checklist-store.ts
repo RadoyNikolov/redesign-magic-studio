@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GEAR, uid } from "@/data/gear";
+import type { ItemDetails } from "@/lib/item-fields";
 
 const STORAGE_KEY = "cameraGearChecklist_v2";
 
@@ -17,6 +18,8 @@ export type Item = {
   assigneeId?: string | null;
   /** alphabetical index letter used for grouping / labeling */
   letterIndex?: string | null;
+  /** per-item spec sheet, fields depend on the category (see item-fields.ts) */
+  details?: ItemDetails;
 };
 
 export type Category = {

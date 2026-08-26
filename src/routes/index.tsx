@@ -45,6 +45,7 @@ function Index() {
   const [filter, setFilter] = useState<Filter>("all");
   const [newCatName, setNewCatName] = useState("");
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [printPrivate, setPrintPrivate] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toast = useCallback((msg: string) => {
@@ -167,6 +168,13 @@ function Index() {
   };
 
   const handlePrint = () => {
+    const hasPrivate = state.categories.some((c) =>
+      c.items.some((i) => i.details?.privateNotes?.trim()),
+    );
+    const includePrivate = hasPrivate
+      ? confirm("Include Private Notes in the PDF?\n\nOK = include · Cancel = leave them out")
+      : false;
+    setPrintPrivate(includePrivate);
     const hadCollapsed = state.project.collapsed || state.categories.some((c) => c.collapsed);
     if (hadCollapsed) {
       const collapsedIds = state.categories.filter((c) => c.collapsed).map((c) => c.id);
@@ -297,6 +305,7 @@ function Index() {
               visible={visible}
               collapsed={cat.collapsed && filter === "all"}
               showAddRow={filter === "all"}
+              printPrivateNotes={printPrivate}
               contacts={state.project.contacts.filter((c) => c.name.trim() || c.role.trim())}
               onAssign={(itemId, contactId) =>
                 mutate((d) => {
@@ -304,6 +313,14 @@ function Index() {
                     .find((c) => c.id === cat.id)
                     ?.items.find((i) => i.id === itemId);
                   if (t) t.assigneeId = contactId;
+                })
+              }
+              onDetails={(itemId, patch) =>
+                mutate((d) => {
+                  const t = d.categories
+                    .find((c) => c.id === cat.id)
+                    ?.items.find((i) => i.id === itemId);
+                  if (t) t.details = { ...(t.details ?? {}), ...patch };
                 })
               }
               onLetterIndex={(itemId, letter) =>
