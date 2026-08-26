@@ -120,6 +120,11 @@ export function fieldsForCategory(categoryName: string): FieldDef[] {
   return SCHEMAS[categoryName] ?? GENERIC_FIELDS;
 }
 
+/** True when the category has a dedicated technical spec sheet. */
+export function hasFieldSchema(categoryName: string): boolean {
+  return !!SCHEMAS[categoryName];
+}
+
 export function resolveOptions(field: FieldDef, itemName: string): string[] | null {
   if (field.options) return field.options;
   if (field.optionsFor) return field.optionsFor(itemName);
