@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Category, Contact, Item, Status } from "@/lib/checklist-store";
 import type { Family } from "@/data/gear";
 import { AddRow } from "./AddRow";
 import { LetterBadge } from "./LetterIndexSelect";
 import { ItemDetailsDialog } from "./ItemDetailsDialog";
-import { detailSummary, fieldsForCategory, type ItemDetails } from "@/lib/item-fields";
+import {
+  detailSummary,
+  fieldsForCategory,
+  hasFieldSchema,
+  type ItemDetails,
+} from "@/lib/item-fields";
 import { formatDateRange } from "@/lib/dates";
 
 type Props = {
@@ -68,6 +73,28 @@ export function CategoryCard({
 }: Props) {
   const [openItemId, setOpenItemId] = useState<string | null>(null);
   const openItem = cat.items.find((i) => i.id === openItemId) ?? null;
+
+  // When a new item is picked from the suggestions, open its spec sheet right away.
+  const autoOpenName = useRef<string | null>(null);
+  const knownIds = useRef<Set<string>>(new Set(cat.items.map((i) => i.id)));
+
+  useEffect(() => {
+    const fresh = cat.items.filter((i) => !knownIds.current.has(i.id));
+    knownIds.current = new Set(cat.items.map((i) => i.id));
+    if (!autoOpenName.current) return;
+    const target =
+      fresh.find((i) => i.name === autoOpenName.current) ?? (fresh.length === 1 ? fresh[0] : null);
+    if (target) {
+      autoOpenName.current = null;
+      setOpenItemId(target.id);
+    }
+  }, [cat.items]);
+
+  const handleAdd: Props["onAdd"] = (name, qty, group, assigneeId) => {
+    if (hasFieldSchema(cat.name)) autoOpenName.current = name;
+    onAdd(name, qty, group, assigneeId);
+  };
+
 
   const cHave = cat.items.filter((i) => i.status === "have").length;
   const cLook = cat.items.filter((i) => i.status === "looking").length;
@@ -320,7 +347,7 @@ export function CategoryCard({
           ))}
           <div className="divide-y divide-border/40">{ungrouped.map(renderItem)}</div>
 
-          {showAddRow && <AddRow cat={cat} onAdd={onAdd} onAddFamily={onAddFamily} />}
+          {showAddRow && <AddRow cat={cat} onAdd={handleAdd} onAddFamily={onAddFamily} />}
         </div>
       )}
 
