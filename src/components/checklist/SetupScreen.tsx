@@ -64,6 +64,16 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
     return () => document.removeEventListener("mousedown", onDown);
   }, [calField]);
 
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("[data-rental-row]")) return;
+      setRentalOpenId(null);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
   const pickDay = (iso: string) => {
     if (!calField) return;
     const field = calField;
