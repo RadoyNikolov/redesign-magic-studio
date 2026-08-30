@@ -69,6 +69,17 @@ function Index() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [printPrivate, setPrintPrivate] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { isAdmin } = useAdmin();
+  const [, setNamesVersion] = useState(0);
+
+  useEffect(() => {
+    fetchGearNamesFromCloud()
+      .then(() => setNamesVersion((v) => v + 1))
+      .catch(() => {
+        /* offline / not reachable — keep the locally cached names */
+      });
+  }, []);
+
 
   const toast = useCallback((msg: string) => {
     setToastMsg(msg);
