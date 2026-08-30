@@ -143,7 +143,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                 <span className="text-xs text-muted-foreground">▾</span>
               </button>
               {typeOpen && (
-                <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-auto rounded-md border border-border bg-elevated shadow-panel">
+                <div className="absolute left-0 right-0 top-full z-30 mt-1 rounded-md border border-border bg-elevated shadow-panel">
                   {PROJECT_TYPES.map((t) => (
                     <button
                       key={t}
