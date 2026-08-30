@@ -38,12 +38,8 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const [calField, setCalField] = useState<DateField | null>(null);
   const pickStart = useRef<string | null>(null);
   const [rentalOpenId, setRentalOpenId] = useState<string | null>(null);
+  const [typeOpen, setTypeOpen] = useState(false);
   const p = state.project;
-  const [otherType, setOtherType] = useState(
-    () => !!p.type && !PROJECT_TYPES.includes(p.type),
-  );
-  const isOtherType = otherType || (!!p.type && !PROJECT_TYPES.includes(p.type));
-
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -66,6 +62,17 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest("[data-project-type]")) return;
+      setTypeOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
 
   const pickDay = (iso: string) => {
     if (!calField) return;
