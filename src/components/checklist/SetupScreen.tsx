@@ -106,19 +106,48 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
             <label className="slate-label mb-1.5 block" htmlFor="setupType">
               Project type
             </label>
-            <input
+            <select
               id="setupType"
               className={inputCls}
-              value={p.type}
-              placeholder="FEATURE FILM"
+              value={isOtherType ? "Other" : p.type}
               onChange={(e) => {
                 const v = e.target.value;
+                if (v === "Other") {
+                  setOtherType(true);
+                  mutate((d) => {
+                    if (PROJECT_TYPES.includes(d.project.type)) d.project.type = "";
+                  });
+                  return;
+                }
+                setOtherType(false);
                 mutate((d) => {
                   d.project.type = v;
                 });
               }}
-            />
+            >
+              <option value="">Select type…</option>
+              {PROJECT_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+              <option value="Other">Other</option>
+            </select>
+            {isOtherType && (
+              <input
+                className={`${inputCls} mt-2`}
+                placeholder="Type your own"
+                value={p.type}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  mutate((d) => {
+                    d.project.type = v;
+                  });
+                }}
+              />
+            )}
           </div>
+
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
