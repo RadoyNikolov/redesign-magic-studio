@@ -66,6 +66,7 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
+      console.log("mousedown target:", t.tagName, t.id, t.closest("[data-project-type]") ? "inside" : "outside");
       if (t.closest("[data-project-type]")) return;
       setTypeOpen(false);
     };
