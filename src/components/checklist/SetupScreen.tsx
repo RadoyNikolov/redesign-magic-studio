@@ -138,7 +138,10 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                     ? "border-border bg-elevated text-foreground"
                     : "border-border bg-elevated text-muted-foreground/70"
                 }`}
-                onClick={() => setTypeOpen((o) => !o)}
+                onClick={() => {
+                  console.log("button clicked, current:", typeOpen);
+                  setTypeOpen((o) => !o);
+                }}
               >
                 <span>{p.type || "Select project type"}</span>
                 <span className="text-xs text-muted-foreground">▾</span>
