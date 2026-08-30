@@ -19,6 +19,18 @@ const FIELD_TITLE: Record<DateField, string> = {
   returnDate: "Equipment return",
 };
 
+export const PROJECT_TYPES = [
+  "Feature Film",
+  "Short Film",
+  "Commercial",
+  "TV Series",
+  "TV Movie",
+  "Corporate Movie",
+  "Documentary",
+  "Live Event",
+  "Video Clip",
+];
+
 const inputCls =
   "w-full rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground transition-colors placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none";
 
@@ -27,6 +39,11 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
   const pickStart = useRef<string | null>(null);
   const [rentalOpenId, setRentalOpenId] = useState<string | null>(null);
   const p = state.project;
+  const [otherType, setOtherType] = useState(
+    () => !!p.type && !PROJECT_TYPES.includes(p.type),
+  );
+  const isOtherType = otherType || (!!p.type && !PROJECT_TYPES.includes(p.type));
+
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
