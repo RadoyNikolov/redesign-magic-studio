@@ -126,41 +126,15 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
               }}
             />
           </div>
-          <div>
+          <div data-project-type>
             <label className="slate-label mb-1.5 block" htmlFor="setupType">
               Project type
             </label>
-            <select
-              id="setupType"
-              className={inputCls}
-              value={isOtherType ? "Other" : p.type}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v === "Other") {
-                  setOtherType(true);
-                  mutate((d) => {
-                    if (PROJECT_TYPES.includes(d.project.type)) d.project.type = "";
-                  });
-                  return;
-                }
-                setOtherType(false);
-                mutate((d) => {
-                  d.project.type = v;
-                });
-              }}
-            >
-              <option value="">Select type…</option>
-              {PROJECT_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-            {isOtherType && (
+            <div className="relative">
               <input
-                className={`${inputCls} mt-2`}
-                placeholder="Type your own"
+                id="setupType"
+                className={`${inputCls} pr-8`}
+                placeholder="Select or type a project type"
                 value={p.type}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -168,9 +142,39 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                     d.project.type = v;
                   });
                 }}
+                onFocus={() => setTypeOpen(true)}
               />
-            )}
+              <button
+                type="button"
+                aria-label="Show project types"
+                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => setTypeOpen((o) => !o)}
+              >
+                ▾
+              </button>
+              {typeOpen && (
+                <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-auto rounded-md border border-border bg-elevated shadow-panel">
+                  {PROJECT_TYPES.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      className="block w-full px-3 py-2 text-left text-sm text-foreground hover:bg-card"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        mutate((d) => {
+                          d.project.type = t;
+                        });
+                        setTypeOpen(false);
+                      }}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+
 
         </div>
 
