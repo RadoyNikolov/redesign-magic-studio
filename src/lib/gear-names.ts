@@ -117,18 +117,26 @@ export function listGearEntries(): GearEntry[] {
   return out;
 }
 
-/** Save a batch of renames. Empty / unchanged values clear the override. */
+/** Save a batch of renames locally. Empty / unchanged values clear the override. */
 export function saveGearNames(changes: Record<string, string>) {
   const map = readOverrides();
   const byKey = new Map(listGearEntries().map((e) => [e.key, e]));
+  const removed: string[] = [];
+  const upserted: Record<string, string> = {};
   for (const [key, value] of Object.entries(changes)) {
     const entry = byKey.get(key);
     const next = value.trim();
-    if (!entry || !next || next === entry.original) delete map[key];
-    else map[key] = next;
+    if (!entry || !next || next === entry.original) {
+      delete map[key];
+      removed.push(key);
+    } else {
+      map[key] = next;
+      upserted[key] = next;
+    }
   }
   writeOverrides(map);
   applyGearNameOverrides();
+  return { upserted, removed };
 }
 
 export function resetGearNames() {
@@ -136,6 +144,13 @@ export function resetGearNames() {
   applyGearNameOverrides();
 }
 
+/** Replace the whole local cache with the shared (cloud) name map. */
+export function setGearNameOverrides(map: Record<string, string>) {
+  writeOverrides(map);
+  applyGearNameOverrides();
+}
+
 export function overrideCount() {
   return Object.keys(readOverrides()).length;
+
 }
