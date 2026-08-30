@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import {
   listGearEntries,
   overrideCount,
@@ -7,17 +7,23 @@ import {
   saveGearNames,
   type GearEntry,
 } from "@/lib/gear-names";
+import {
+  clearGearNamesInCloud,
+  fetchGearNamesFromCloud,
+  pushGearNamesToCloud,
+} from "@/lib/gear-names-remote";
+import { useAdmin } from "@/hooks/useAdmin";
+import { supabase } from "@/integrations/supabase/client";
 import { SlateStripes } from "@/components/checklist/SlateStripes";
 
-export const Route = createFileRoute("/gear-editor")({
-  ssr: false,
+export const Route = createFileRoute("/_authenticated/gear-editor")({
   head: () => ({
     meta: [
       { title: "Gear name editor — Camera Gear Checklist" },
       {
         name: "description",
         content:
-          "Rename any camera, lens, filter or accessory in the gear catalogue directly in the browser — no file downloads needed.",
+          "Owner-only editor for renaming any camera, lens, filter or accessory in the shared gear catalogue.",
       },
       { property: "og:title", content: "Gear name editor — Camera Gear Checklist" },
       {
@@ -38,11 +44,20 @@ const KIND_LABEL: Record<GearEntry["kind"], string> = {
 };
 
 function GearEditor() {
+  const navigate = useNavigate();
+  const { session, isAdmin, adminExists, loading, claimAdmin } = useAdmin();
   const [version, setVersion] = useState(0);
   const entries = useMemo(() => listGearEntries(), [version]);
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [status, setStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchGearNamesFromCloud()
+      .then(() => setVersion((v) => v + 1))
+      .catch(() => setStatus("Could not load the shared names."));
+  }, []);
 
   const cats = useMemo(
     () => ["All", ...Array.from(new Set(entries.map((e) => e.cat)))],
@@ -65,11 +80,64 @@ function GearEditor() {
   const shown = filtered.slice(0, 400);
   const dirty = Object.keys(drafts).length;
 
-  const save = () => {
-    saveGearNames(drafts);
+  const save = async () => {
+    const { upserted, removed } = saveGearNames(drafts);
     setDrafts({});
     setVersion((v) => v + 1);
+    try {
+      await pushGearNamesToCloud(upserted, removed);
+      setStatus("Saved for everyone.");
+    } catch {
+      setStatus("Saved locally, but the shared copy could not be updated.");
+    }
   };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
+  if (loading) {
+    return <p className="px-4 py-16 text-center text-sm text-muted-foreground">Loading…</p>;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="mx-auto w-full max-w-[520px] px-4 py-16">
+        <SlateStripes />
+        <h1 className="mt-5 text-2xl text-foreground">Owner access only</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Signed in as {session?.user.email ?? "unknown"}. This account is not the catalogue
+          owner, so gear names are read-only here.
+        </p>
+        {adminExists === false && (
+          <button
+            type="button"
+            onClick={async () => {
+              const ok = await claimAdmin();
+              setStatus(ok ? "You are now the owner." : "An owner already exists.");
+            }}
+            className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            Claim owner access
+          </button>
+        )}
+        {status && <p className="mt-3 text-sm text-muted-foreground">{status}</p>}
+        <div className="mt-6 flex gap-3 text-sm">
+          <Link to="/" className="text-muted-foreground underline-offset-4 hover:underline">
+            ← Back to checklist
+          </Link>
+          <button
+            type="button"
+            onClick={signOut}
+            className="text-muted-foreground underline-offset-4 hover:underline"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[960px] px-4 pb-32">
@@ -80,8 +148,8 @@ function GearEditor() {
           Gear name editor
         </h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Rename any entry in the gear catalogue. Changes are saved in this browser and used
-          everywhere in the checklist — {overrideCount()} custom name(s) active.
+          Rename any entry in the gear catalogue. Changes are shared with everyone using the
+          checklist — {overrideCount()} custom name(s) active.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link
@@ -92,18 +160,31 @@ function GearEditor() {
           </Link>
           <button
             type="button"
-            onClick={() => {
-              if (confirm("Reset every name back to the original catalogue?")) {
-                resetGearNames();
-                setDrafts({});
-                setVersion((v) => v + 1);
+            onClick={async () => {
+              if (!confirm("Reset every name back to the original catalogue?")) return;
+              resetGearNames();
+              setDrafts({});
+              setVersion((v) => v + 1);
+              try {
+                await clearGearNamesInCloud();
+                setStatus("All names reset.");
+              } catch {
+                setStatus("Reset locally, but the shared copy could not be updated.");
               }
             }}
             className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Reset all names
           </button>
+          <button
+            type="button"
+            onClick={signOut}
+            className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Sign out
+          </button>
         </div>
+        {status && <p className="mt-3 text-xs text-muted-foreground">{status}</p>}
       </header>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -149,9 +230,7 @@ function GearEditor() {
                   changed ? "border-primary" : "border-border"
                 }`}
                 value={value}
-                onChange={(ev) =>
-                  setDrafts((d) => ({ ...d, [e.key]: ev.target.value }))
-                }
+                onChange={(ev) => setDrafts((d) => ({ ...d, [e.key]: ev.target.value }))}
               />
               {e.current !== e.original && (
                 <span

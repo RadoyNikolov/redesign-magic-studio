@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import type { Family } from "@/data/gear";
 import { useChecklist, type Category, type Item, type Status } from "@/lib/checklist-store";
 import { LETTER_INDEX } from "@/lib/letter-index";
 import type { ItemDetails } from "@/lib/item-fields";
 import "@/lib/gear-names";
+import { fetchGearNamesFromCloud } from "@/lib/gear-names-remote";
+import { useAdmin } from "@/hooks/useAdmin";
 
 import { CategoryCard } from "@/components/checklist/CategoryCard";
 import { ProjectCard } from "@/components/checklist/ProjectCard";
@@ -67,6 +69,17 @@ function Index() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [printPrivate, setPrintPrivate] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { isAdmin } = useAdmin();
+  const [, setNamesVersion] = useState(0);
+
+  useEffect(() => {
+    fetchGearNamesFromCloud()
+      .then(() => setNamesVersion((v) => v + 1))
+      .catch(() => {
+        /* offline / not reachable — keep the locally cached names */
+      });
+  }, []);
+
 
   const toast = useCallback((msg: string) => {
     setToastMsg(msg);
@@ -257,12 +270,14 @@ function Index() {
           browser.
         </p>
 
-        <Link
-          to="/gear-editor"
-          className="mt-3 inline-flex items-center rounded-md border border-border bg-elevated px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Edit gear names
-        </Link>
+        {isAdmin && (
+          <Link
+            to="/gear-editor"
+            className="mt-3 inline-flex items-center rounded-md border border-border bg-elevated px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Edit gear names
+          </Link>
+        )}
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
