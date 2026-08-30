@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      gear_catalog_edits: {
+        Row: {
+          cat: string
+          group: string | null
+          key: string
+          kind: string
+          name: string | null
+          updated_at: string
+        }
+        Insert: {
+          cat: string
+          group?: string | null
+          key: string
+          kind: string
+          name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cat?: string
+          group?: string | null
+          key?: string
+          kind?: string
+          name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gear_name_overrides: {
         Row: {
           key: string
