@@ -127,33 +127,23 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
             />
           </div>
           <div data-project-type>
-            <label className="slate-label mb-1.5 block" htmlFor="setupType">
-              Project type
-            </label>
+            <label className="slate-label mb-1.5 block">Project type</label>
             <div className="relative">
-              <input
-                id="setupType"
-                className={`${inputCls} pr-8`}
-                placeholder="Select or type a project type"
-                value={p.type}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  mutate((d) => {
-                    d.project.type = v;
-                  });
-                }}
-                onFocus={() => setTypeOpen(true)}
-              />
               <button
                 type="button"
-                aria-label="Show project types"
-                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+                id="setupType"
+                className={`flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+                  p.type
+                    ? "border-border bg-elevated text-foreground"
+                    : "border-border bg-elevated text-muted-foreground/70"
+                }`}
                 onClick={() => setTypeOpen((o) => !o)}
               >
-                ▾
+                <span>{p.type || "Select project type"}</span>
+                <span className="text-xs text-muted-foreground">▾</span>
               </button>
               {typeOpen && (
-                <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-auto rounded-md border border-border bg-elevated shadow-panel">
+                <div className="absolute left-0 right-0 top-full z-30 mt-1 rounded-md border border-border bg-elevated shadow-panel">
                   {PROJECT_TYPES.map((t) => (
                     <button
                       key={t}
@@ -170,6 +160,20 @@ export function SetupScreen({ state, mutate, onContinue }: Props) {
                       {t}
                     </button>
                   ))}
+                  <div className="border-t border-border px-3 py-2">
+                    <input
+                      className={`${inputCls}`}
+                      placeholder="Other (type here)"
+                      value={PROJECT_TYPES.includes(p.type) ? "" : p.type}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        mutate((d) => {
+                          d.project.type = v;
+                        });
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
                 </div>
               )}
             </div>
