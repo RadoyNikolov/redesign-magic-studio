@@ -50,17 +50,31 @@ export function DateRangeCalendar({
   readOnly = false,
   className = "",
 }: Props) {
-  const base = project[field].start ? parseIso(project[field].start) : new Date();
+  const anchorFor = (f: DateField) => {
+    const own = project[f].start;
+    if (own) return parseIso(own);
+    // fall back to the latest date already picked in the other fields
+    const others = FIELDS.filter((k) => k !== f)
+      .flatMap((k) => [project[k].start, project[k].end])
+      .filter(Boolean) as string[];
+    if (others.length) {
+      const latest = others.reduce((a, b) => (a > b ? a : b));
+      return parseIso(latest);
+    }
+    return new Date();
+  };
+
+  const base = anchorFor(field);
   const [viewY, setViewY] = useState(base.getFullYear());
   const [viewM, setViewM] = useState(base.getMonth());
 
   useEffect(() => {
-    const r = project[field];
-    const b = r.start ? parseIso(r.start) : new Date();
+    const b = anchorFor(field);
     setViewY(b.getFullYear());
     setViewM(b.getMonth());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field]);
+
 
   const startDow = new Date(viewY, viewM, 1).getDay();
   const daysInMonth = new Date(viewY, viewM + 1, 0).getDate();
