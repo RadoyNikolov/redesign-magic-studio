@@ -203,9 +203,7 @@ const GEAR: Record<string, [string, number, string?][]> = {
     ...DIGITAL_CAMERAS.map(
       ([n, q]) => [n, q, `Digital Cameras · ${cameraBrand(n)}`] as [string, number, string],
     ),
-    ...FILM_CAMERAS.map(
-      ([n, q]) => [n, q, `Film Cameras · ${cameraBrand(n)}`] as [string, number, string],
-    ),
+    ...FILM_CAMERAS.map(([n, q]) => [n, q, "Film Cameras"] as [string, number, string]),
   ],
 
   Lenses: [
