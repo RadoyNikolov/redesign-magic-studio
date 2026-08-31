@@ -343,6 +343,18 @@ function GearEditor() {
                   renamed
                 </span>
               )}
+              {e.custom && (
+                <span className="shrink-0 text-[11px] text-primary">added</span>
+              )}
+              <button
+                type="button"
+                onClick={() => void removeEntry(e)}
+                title="Remove from catalogue"
+                className="shrink-0 rounded-md border border-border px-2 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+              >
+                Remove
+              </button>
+
             </div>
           );
         })}
