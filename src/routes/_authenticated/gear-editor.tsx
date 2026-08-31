@@ -238,6 +238,58 @@ function GearEditor() {
         {status && <p className="mt-3 text-xs text-muted-foreground">{status}</p>}
       </header>
 
+      <section className="mt-6 rounded-lg border border-border bg-card p-3">
+        <p className="slate-label">Add an item</p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <select
+            className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground sm:w-52"
+            value={newCat}
+            onChange={(e) => {
+              setNewCat(e.target.value);
+              setNewGroup("");
+            }}
+          >
+            <option value="">Category…</option>
+            {allCats.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <select
+            className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground sm:w-52"
+            value={newGroup}
+            onChange={(e) => setNewGroup(e.target.value)}
+            disabled={!newCat}
+          >
+            <option value="">No sub-group</option>
+            {groupOptions.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+          <input
+            className="min-w-0 flex-1 rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70"
+            placeholder="New item name…"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") void addItem();
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => void addItem()}
+            disabled={!newCat || !newName.trim()}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
+          >
+            Add
+          </button>
+        </div>
+      </section>
+
+
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <input
           className="flex-1 rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70"
