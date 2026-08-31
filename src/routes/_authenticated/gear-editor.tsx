@@ -1,8 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
+  addGearItem,
+  editCounts,
+  listCategories,
   listGearEntries,
+  listGroups,
   overrideCount,
+  removeGearEntry,
   resetGearNames,
   saveGearNames,
   type GearEntry,
@@ -10,11 +15,14 @@ import {
 import {
   clearGearNamesInCloud,
   fetchGearNamesFromCloud,
+  pushCustomItemToCloud,
   pushGearNamesToCloud,
+  pushRemovalToCloud,
 } from "@/lib/gear-names-remote";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { SlateStripes } from "@/components/checklist/SlateStripes";
+
 
 export const Route = createFileRoute("/_authenticated/gear-editor")({
   head: () => ({
