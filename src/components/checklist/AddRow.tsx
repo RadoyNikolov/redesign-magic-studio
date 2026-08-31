@@ -53,6 +53,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [pickerFilter, setPickerFilter] = useState("");
   const [browseGroup, setBrowseGroup] = useState<string | null>(null);
+  const [browsePath, setBrowsePath] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +75,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     setChecked(new Set());
     setPickerFilter("");
     setBrowseGroup(null);
+    setBrowsePath([]);
     setSel(-1);
   };
 
@@ -122,22 +124,53 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     }
     setQ("");
     setBrowseGroup(null);
+    setBrowsePath([]);
     const groups = getCategoryGroups(cat.name);
     setMode(groups.size > 0 ? "browseCats" : "browseItems");
     inputRef.current?.focus();
   };
 
+  const SEP = " · ";
   const groups = getCategoryGroups(cat.name);
+  const groupNamesAll = [...groups.keys()];
+  /** Sub-sections directly under the current browse path, alphabetical. */
+  const childSegments = (path: string[]) => {
+    const prefix = path.length ? path.join(SEP) + SEP : "";
+    const out = new Set<string>();
+    groupNamesAll.forEach((name) => {
+      if (path.length && !name.startsWith(prefix)) return;
+      const rest = name.slice(prefix.length);
+      if (!rest) return;
+      out.add(rest.split(SEP)[0]!);
+    });
+    return [...out].sort((a, b) => a.localeCompare(b));
+  };
+  /** Items reachable at or below the given group path. */
+  const collectAt = (path: string[]) => {
+    const full = path.join(SEP);
+    const flats: Flat[] = [];
+    const families: Family[] = [];
+    groupNamesAll.forEach((name) => {
+      if (name !== full && !name.startsWith(full + SEP)) return;
+      const g = groups.get(name)!;
+      flats.push(...g.flats);
+      families.push(...g.families);
+    });
+    return { flats, families };
+  };
+
   const browseList = (() => {
     if (mode !== "browseItems") return null;
     if (browseGroup) {
-      const g = groups.get(browseGroup) ?? { flats: [], families: [] };
+      const path = browseGroup.split(SEP);
+      const g = collectAt(path);
       return {
-        title: browseGroup,
+        title: path.join(SEP),
         families: [...g.families].sort((a, b) => a.label.localeCompare(b.label)),
         flats: [...g.flats].sort((a, b) => a.name.localeCompare(b.name)),
         back: () => {
           setBrowseGroup(null);
+          setBrowsePath(path.slice(0, -1));
           setMode("browseCats");
         },
       };
@@ -249,7 +282,23 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
             {mode === "browseCats" && (
               <>
                 <div className="sticky top-0 border-b border-border bg-popover px-3 py-2">
-                  <span className="slate-label">{cat.name} — browse</span>
+                  <div className="flex items-center gap-2">
+                    {browsePath.length > 0 && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          stop(e);
+                          setBrowsePath(browsePath.slice(0, -1));
+                        }}
+                        className="rounded border border-border px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        ←
+                      </button>
+                    )}
+                    <span className="slate-label">
+                      {browsePath.length ? browsePath.join(SEP) : `${cat.name} — browse`}
+                    </span>
+                  </div>
                 </div>
                 {(() => {
                   const seen = new Set<string>();
