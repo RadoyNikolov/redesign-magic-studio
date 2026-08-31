@@ -60,6 +60,47 @@ function GearEditor() {
   const [cat, setCat] = useState("All");
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<string | null>(null);
+  const [newCat, setNewCat] = useState("");
+  const [newGroup, setNewGroup] = useState("");
+  const [newName, setNewName] = useState("");
+
+  const allCats = useMemo(() => listCategories(), [version]);
+  const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
+  const counts = useMemo(() => editCounts(), [version]);
+
+  const addItem = async () => {
+    const created = addGearItem(newCat, newName, newGroup || null);
+    if (!created) {
+      setStatus("Pick a category and a name that is not already in the list.");
+      return;
+    }
+    setNewName("");
+    setVersion((v) => v + 1);
+    try {
+      await pushCustomItemToCloud(created);
+      setStatus(`Added “${created.name}” to ${created.cat} for everyone.`);
+    } catch {
+      setStatus("Added locally, but the shared copy could not be updated.");
+    }
+  };
+
+  const removeEntry = async (entry: GearEntry) => {
+    if (!confirm(`Remove “${entry.current}” from ${entry.cat}?`)) return;
+    const res = removeGearEntry(entry.key);
+    setDrafts((d) => {
+      const next = { ...d };
+      delete next[entry.key];
+      return next;
+    });
+    setVersion((v) => v + 1);
+    try {
+      await pushRemovalToCloud(entry.key, entry.cat, res.deletedCustom ? "deletedCustom" : "hidden");
+      setStatus(`Removed “${entry.current}” for everyone.`);
+    } catch {
+      setStatus("Removed locally, but the shared copy could not be updated.");
+    }
+  };
+
 
   useEffect(() => {
     fetchGearNamesFromCloud()
