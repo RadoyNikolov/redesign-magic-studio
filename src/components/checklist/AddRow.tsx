@@ -282,7 +282,23 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
             {mode === "browseCats" && (
               <>
                 <div className="sticky top-0 border-b border-border bg-popover px-3 py-2">
-                  <span className="slate-label">{cat.name} — browse</span>
+                  <div className="flex items-center gap-2">
+                    {browsePath.length > 0 && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          stop(e);
+                          setBrowsePath(browsePath.slice(0, -1));
+                        }}
+                        className="rounded border border-border px-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        ←
+                      </button>
+                    )}
+                    <span className="slate-label">
+                      {browsePath.length ? browsePath.join(SEP) : `${cat.name} — browse`}
+                    </span>
+                  </div>
                 </div>
                 {(() => {
                   const seen = new Set<string>();
