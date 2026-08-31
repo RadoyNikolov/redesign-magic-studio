@@ -176,11 +176,38 @@ const FILM_CAMERAS: [string, number][] = [
 
 /* ---------- Gear knowledge base (from your Camlist project lists) ----------
    Used only for typing suggestions — categories start empty. */
+/** Manufacturer taken from the start of the model name, used for sub-headers. */
+const cameraBrand = (name: string): string => {
+  const brands = [
+    "Blackmagic",
+    "Panavision",
+    "MovieCam",
+    "Panasonic",
+    "ARRI",
+    "Sony",
+    "RED",
+    "Canon",
+    "Nikon",
+    "DJI",
+    "GoPro",
+    "Aaton",
+    "Bolex",
+    "Eclair",
+    "IMAX",
+  ];
+  return brands.find((b) => name.toLowerCase().startsWith(b.toLowerCase())) ?? "Other";
+};
+
 const GEAR: Record<string, [string, number, string?][]> = {
   Cameras: [
-    ...DIGITAL_CAMERAS.map(([n, q]) => [n, q, "Digital Cameras"] as [string, number, string]),
-    ...FILM_CAMERAS.map(([n, q]) => [n, q, "Film Cameras"] as [string, number, string]),
+    ...DIGITAL_CAMERAS.map(
+      ([n, q]) => [n, q, `Digital Cameras · ${cameraBrand(n)}`] as [string, number, string],
+    ),
+    ...FILM_CAMERAS.map(
+      ([n, q]) => [n, q, `Film Cameras · ${cameraBrand(n)}`] as [string, number, string],
+    ),
   ],
+
   Lenses: [
     ["Leitz Hugo Set · LPL · Metric (21-24-28-35-50-75-90mm T1.5 + 50-N T1.0)", 1, "Prime"],
     ["ARRI Zeiss Master Macro 100mm T2.0 · PL", 1, "Prime"],
