@@ -1,8 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
+  addGearItem,
+  editCounts,
+  listCategories,
   listGearEntries,
+  listGroups,
   overrideCount,
+  removeGearEntry,
   resetGearNames,
   saveGearNames,
   type GearEntry,
@@ -10,11 +15,14 @@ import {
 import {
   clearGearNamesInCloud,
   fetchGearNamesFromCloud,
+  pushCustomItemToCloud,
   pushGearNamesToCloud,
+  pushRemovalToCloud,
 } from "@/lib/gear-names-remote";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { SlateStripes } from "@/components/checklist/SlateStripes";
+
 
 export const Route = createFileRoute("/_authenticated/gear-editor")({
   head: () => ({
@@ -52,6 +60,47 @@ function GearEditor() {
   const [cat, setCat] = useState("All");
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<string | null>(null);
+  const [newCat, setNewCat] = useState("");
+  const [newGroup, setNewGroup] = useState("");
+  const [newName, setNewName] = useState("");
+
+  const allCats = useMemo(() => listCategories(), [version]);
+  const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
+  const counts = useMemo(() => editCounts(), [version]);
+
+  const addItem = async () => {
+    const created = addGearItem(newCat, newName, newGroup || null);
+    if (!created) {
+      setStatus("Pick a category and a name that is not already in the list.");
+      return;
+    }
+    setNewName("");
+    setVersion((v) => v + 1);
+    try {
+      await pushCustomItemToCloud(created);
+      setStatus(`Added “${created.name}” to ${created.cat} for everyone.`);
+    } catch {
+      setStatus("Added locally, but the shared copy could not be updated.");
+    }
+  };
+
+  const removeEntry = async (entry: GearEntry) => {
+    if (!confirm(`Remove “${entry.current}” from ${entry.cat}?`)) return;
+    const res = removeGearEntry(entry.key);
+    setDrafts((d) => {
+      const next = { ...d };
+      delete next[entry.key];
+      return next;
+    });
+    setVersion((v) => v + 1);
+    try {
+      await pushRemovalToCloud(entry.key, entry.cat, res.deletedCustom ? "deletedCustom" : "hidden");
+      setStatus(`Removed “${entry.current}” for everyone.`);
+    } catch {
+      setStatus("Removed locally, but the shared copy could not be updated.");
+    }
+  };
+
 
   useEffect(() => {
     fetchGearNamesFromCloud()
@@ -148,9 +197,11 @@ function GearEditor() {
           Gear name editor
         </h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Rename any entry in the gear catalogue. Changes are shared with everyone using the
-          checklist — {overrideCount()} custom name(s) active.
+          Rename, add or remove entries in the gear catalogue. Changes are shared with everyone
+          using the checklist — {overrideCount()} renamed, {counts.added} added, {counts.removed}{" "}
+          removed.
         </p>
+
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link
             to="/"
@@ -161,13 +212,13 @@ function GearEditor() {
           <button
             type="button"
             onClick={async () => {
-              if (!confirm("Reset every name back to the original catalogue?")) return;
+              if (!confirm("Reset the catalogue: undo every rename, addition and removal?")) return;
               resetGearNames();
               setDrafts({});
               setVersion((v) => v + 1);
               try {
                 await clearGearNamesInCloud();
-                setStatus("All names reset.");
+                setStatus("Catalogue reset.");
               } catch {
                 setStatus("Reset locally, but the shared copy could not be updated.");
               }
@@ -186,6 +237,58 @@ function GearEditor() {
         </div>
         {status && <p className="mt-3 text-xs text-muted-foreground">{status}</p>}
       </header>
+
+      <section className="mt-6 rounded-lg border border-border bg-card p-3">
+        <p className="slate-label">Add an item</p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <select
+            className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground sm:w-52"
+            value={newCat}
+            onChange={(e) => {
+              setNewCat(e.target.value);
+              setNewGroup("");
+            }}
+          >
+            <option value="">Category…</option>
+            {allCats.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <select
+            className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground sm:w-52"
+            value={newGroup}
+            onChange={(e) => setNewGroup(e.target.value)}
+            disabled={!newCat}
+          >
+            <option value="">No sub-group</option>
+            {groupOptions.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+          <input
+            className="min-w-0 flex-1 rounded-md border border-border bg-elevated px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70"
+            placeholder="New item name…"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") void addItem();
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => void addItem()}
+            disabled={!newCat || !newName.trim()}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
+          >
+            Add
+          </button>
+        </div>
+      </section>
+
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <input
@@ -240,6 +343,18 @@ function GearEditor() {
                   renamed
                 </span>
               )}
+              {e.custom && (
+                <span className="shrink-0 text-[11px] text-primary">added</span>
+              )}
+              <button
+                type="button"
+                onClick={() => void removeEntry(e)}
+                title="Remove from catalogue"
+                className="shrink-0 rounded-md border border-border px-2 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+              >
+                Remove
+              </button>
+
             </div>
           );
         })}
