@@ -75,6 +75,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     setChecked(new Set());
     setPickerFilter("");
     setBrowseGroup(null);
+    setBrowsePath([]);
     setSel(-1);
   };
 
