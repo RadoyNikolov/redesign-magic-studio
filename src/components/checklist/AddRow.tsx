@@ -124,22 +124,53 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
     }
     setQ("");
     setBrowseGroup(null);
+    setBrowsePath([]);
     const groups = getCategoryGroups(cat.name);
     setMode(groups.size > 0 ? "browseCats" : "browseItems");
     inputRef.current?.focus();
   };
 
+  const SEP = " · ";
   const groups = getCategoryGroups(cat.name);
+  const groupNamesAll = [...groups.keys()];
+  /** Sub-sections directly under the current browse path, alphabetical. */
+  const childSegments = (path: string[]) => {
+    const prefix = path.length ? path.join(SEP) + SEP : "";
+    const out = new Set<string>();
+    groupNamesAll.forEach((name) => {
+      if (path.length && !name.startsWith(prefix)) return;
+      const rest = name.slice(prefix.length);
+      if (!rest) return;
+      out.add(rest.split(SEP)[0]!);
+    });
+    return [...out].sort((a, b) => a.localeCompare(b));
+  };
+  /** Items reachable at or below the given group path. */
+  const collectAt = (path: string[]) => {
+    const full = path.join(SEP);
+    const flats: Flat[] = [];
+    const families: Family[] = [];
+    groupNamesAll.forEach((name) => {
+      if (name !== full && !name.startsWith(full + SEP)) return;
+      const g = groups.get(name)!;
+      flats.push(...g.flats);
+      families.push(...g.families);
+    });
+    return { flats, families };
+  };
+
   const browseList = (() => {
     if (mode !== "browseItems") return null;
     if (browseGroup) {
-      const g = groups.get(browseGroup) ?? { flats: [], families: [] };
+      const path = browseGroup.split(SEP);
+      const g = collectAt(path);
       return {
-        title: browseGroup,
+        title: path.join(SEP),
         families: [...g.families].sort((a, b) => a.label.localeCompare(b.label)),
         flats: [...g.flats].sort((a, b) => a.name.localeCompare(b.name)),
         back: () => {
           setBrowseGroup(null);
+          setBrowsePath(path.slice(0, -1));
           setMode("browseCats");
         },
       };
