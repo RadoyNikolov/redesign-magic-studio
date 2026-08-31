@@ -197,9 +197,11 @@ function GearEditor() {
           Gear name editor
         </h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Rename any entry in the gear catalogue. Changes are shared with everyone using the
-          checklist — {overrideCount()} custom name(s) active.
+          Rename, add or remove entries in the gear catalogue. Changes are shared with everyone
+          using the checklist — {overrideCount()} renamed, {counts.added} added, {counts.removed}{" "}
+          removed.
         </p>
+
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link
             to="/"
