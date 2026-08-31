@@ -53,6 +53,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [pickerFilter, setPickerFilter] = useState("");
   const [browseGroup, setBrowseGroup] = useState<string | null>(null);
+  const [browsePath, setBrowsePath] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
