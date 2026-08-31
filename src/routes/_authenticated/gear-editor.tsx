@@ -212,13 +212,13 @@ function GearEditor() {
           <button
             type="button"
             onClick={async () => {
-              if (!confirm("Reset every name back to the original catalogue?")) return;
+              if (!confirm("Reset the catalogue: undo every rename, addition and removal?")) return;
               resetGearNames();
               setDrafts({});
               setVersion((v) => v + 1);
               try {
                 await clearGearNamesInCloud();
-                setStatus("All names reset.");
+                setStatus("Catalogue reset.");
               } catch {
                 setStatus("Reset locally, but the shared copy could not be updated.");
               }
