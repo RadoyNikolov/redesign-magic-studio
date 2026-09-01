@@ -198,6 +198,59 @@ const cameraBrand = (name: string): string => {
   return brands.find((b) => name.toLowerCase().startsWith(b.toLowerCase())) ?? "Other";
 };
 
+/** Manufacturer taken from the start of a lens/family name. */
+const lensBrand = (name: string): string => {
+  const brands = [
+    "ARRI Rental",
+    "ARRI",
+    "Leitz",
+    "Zeiss",
+    "Atlas",
+    "DZOFilm",
+    "Panavision",
+    "Canon",
+    "Nikon",
+    "Sigma",
+    "Tamron",
+    "Tokina",
+    "Laowa",
+    "Vazen",
+    "Xeen",
+    "Rokinon",
+    "Samyang",
+    "Kowa",
+    "Cooke",
+    "Angenieux",
+    "Fujinon",
+    "Fuji",
+    "Sony",
+    "Voigtlander",
+    "Schneider",
+    "Leica",
+    "Hawk",
+    "P+S Technik",
+    "True Lens",
+    "TLS",
+    "SLR Magic",
+    "Meike",
+    "7Artisans",
+    "Viltrox",
+    "Lomography",
+    "Kipon",
+    "IB/E Optics",
+    "IBE Optics",
+    "Century",
+    "Panasonic",
+    "Olympus",
+  ];
+  const lower = name.toLowerCase();
+  return brands.find((b) => lower.startsWith(b.toLowerCase())) ?? "Other";
+};
+
+const lensGroup = (name: string, base?: string) =>
+  base && (base === "Prime" || base === "Zooms") ? `${base} · ${lensBrand(name)}` : base;
+
+
 const GEAR: Record<string, [string, number, string?][]> = {
   Cameras: [
     ...DIGITAL_CAMERAS.map(
