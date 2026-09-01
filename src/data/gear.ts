@@ -2313,7 +2313,15 @@ ZOOM_LENS_FAMILIES.forEach(([name, mount, info, lenses]) =>
   if (f) f.variants.push("45-135mm T2.4", "70-200mm T2.8");
 }
 
+// Normalize lens family groups to manufacturer sub-levels under Prime / Zooms.
+FAMILIES.filter(
+  (f) => f.cat === "Lenses" && (f.group === "Prime" || f.group === "Zooms"),
+).forEach((f) => {
+  f.group = `${f.group} · ${lensBrand(f.label)}`;
+});
+
 // Numeric sort key for "33mm" / "15-40mm" tokens.
+
 function mmSortKey(m: string) {
   const n = parseFloat(m);
   return isNaN(n) ? Infinity : n;
