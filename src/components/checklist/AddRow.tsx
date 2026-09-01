@@ -307,7 +307,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     seen.add(it.name);
                     return true;
                   });
-                  if (recent.length === 0) return null;
+                  if (recent.length === 0 || browsePath.length > 0) return null;
                   return (
                     <div className="border-b border-border/60">
                       <div className="px-3 pb-1 pt-2">
@@ -333,30 +333,36 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     </div>
                   );
                 })()}
-                {[...groups.keys()]
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((name) => {
-                    const g = groups.get(name)!;
-                    const count = g.flats.length + g.families.length;
-                    return (
-                      <button
-                        key={name}
-                        type="button"
-                        onMouseDown={(e) => {
-                          stop(e);
-                          setBrowseFilter("");
-                          setBrowseGroup(name);
+                {childSegments(browsePath).map((seg) => {
+                  const path = [...browsePath, seg];
+                  const hasChildren = childSegments(path).length > 0;
+                  const g = collectAt(path);
+                  const count = g.flats.length + g.families.length;
+                  return (
+                    <button
+                      key={path.join(SEP)}
+                      type="button"
+                      onMouseDown={(e) => {
+                        stop(e);
+                        setBrowseFilter("");
+                        if (hasChildren) {
+                          setBrowsePath(path);
+                        } else {
+                          setBrowseGroup(path.join(SEP));
                           setMode("browseItems");
-                        }}
-                        className={rowCls}
-                      >
-                        <span>{name}</span>
-                        <span className={chevronCls}>
-                          {count} {count === 1 ? "item ›" : "items ›"}
-                        </span>
-                      </button>
-                    );
-                  })}
+                        }
+                      }}
+                      className={rowCls}
+                    >
+                      <span>{seg}</span>
+                      <span className={chevronCls}>
+                        {hasChildren
+                          ? `${childSegments(path).length} brands ›`
+                          : `${count} ${count === 1 ? "item ›" : "items ›"}`}
+                      </span>
+                    </button>
+                  );
+                })}
               </>
             )}
 
