@@ -1020,17 +1020,22 @@ function addLensFamily(
   mount: string,
   info: string,
   variants: string[],
-  group?: string | null,
+  groupPrefix?: "Prime" | "Zooms" | null,
 ) {
+  const group =
+    groupPrefix && (groupPrefix === "Prime" || groupPrefix === "Zooms")
+      ? `${groupPrefix} · ${lensBrand(label)}`
+      : (groupPrefix ?? null);
   FAMILIES.push({
     cat: "Lenses",
     label,
     info: mount,
     wholeSetSpec: "Set · " + mount + " (" + info + ")",
     variants,
-    group: group ?? null,
+    group,
   });
 }
+
 function addFilterFamily(label: string, grades: string[], setLabelOverride?: string | null) {
   const wholeSetSpec =
     setLabelOverride || "Set (" + grades[0] + " – " + grades[grades.length - 1] + ")";
