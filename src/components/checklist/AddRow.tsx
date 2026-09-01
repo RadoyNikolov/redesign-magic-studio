@@ -307,7 +307,7 @@ export function AddRow({ cat, onAdd, onAddFamily }: Props) {
                     seen.add(it.name);
                     return true;
                   });
-                  if (recent.length === 0) return null;
+                  if (recent.length === 0 || browsePath.length > 0) return null;
                   return (
                     <div className="border-b border-border/60">
                       <div className="px-3 pb-1 pt-2">
