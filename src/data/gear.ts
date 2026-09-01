@@ -198,6 +198,59 @@ const cameraBrand = (name: string): string => {
   return brands.find((b) => name.toLowerCase().startsWith(b.toLowerCase())) ?? "Other";
 };
 
+/** Manufacturer taken from the start of a lens/family name. */
+const lensBrand = (name: string): string => {
+  const brands = [
+    "ARRI Rental",
+    "ARRI",
+    "Leitz",
+    "Zeiss",
+    "Atlas",
+    "DZOFilm",
+    "Panavision",
+    "Canon",
+    "Nikon",
+    "Sigma",
+    "Tamron",
+    "Tokina",
+    "Laowa",
+    "Vazen",
+    "Xeen",
+    "Rokinon",
+    "Samyang",
+    "Kowa",
+    "Cooke",
+    "Angenieux",
+    "Fujinon",
+    "Fuji",
+    "Sony",
+    "Voigtlander",
+    "Schneider",
+    "Leica",
+    "Hawk",
+    "P+S Technik",
+    "True Lens",
+    "TLS",
+    "SLR Magic",
+    "Meike",
+    "7Artisans",
+    "Viltrox",
+    "Lomography",
+    "Kipon",
+    "IB/E Optics",
+    "IBE Optics",
+    "Century",
+    "Panasonic",
+    "Olympus",
+  ];
+  const lower = name.toLowerCase();
+  return brands.find((b) => lower.startsWith(b.toLowerCase())) ?? "Other";
+};
+
+const lensGroup = (name: string, base?: string) =>
+  base && (base === "Prime" || base === "Zooms") ? `${base} · ${lensBrand(name)}` : base;
+
+
 const GEAR: Record<string, [string, number, string?][]> = {
   Cameras: [
     ...DIGITAL_CAMERAS.map(
@@ -208,7 +261,7 @@ const GEAR: Record<string, [string, number, string?][]> = {
     ),
   ],
 
-  Lenses: [
+  Lenses: ([
     ["Leitz Hugo Set · LPL · Metric (21-24-28-35-50-75-90mm T1.5 + 50-N T1.0)", 1, "Prime"],
     ["ARRI Zeiss Master Macro 100mm T2.0 · PL", 1, "Prime"],
     ["Atlas LF Extender 1.6x", 1],
@@ -230,7 +283,8 @@ const GEAR: Record<string, [string, number, string?][]> = {
     ["Panavision Ultra Vista 1.6x Anamorphic Set", 1, "Prime"],
     ["Panavision Primo Zoom SLZ 24-275mm T2.8", 1, "Zooms"],
     ["Panavision Primo Zoom AWZ2 40-80mm T2.8", 1, "Zooms"],
-  ],
+  ] as [string, number, string?][]).map(([n, q, g]) => [n, q, lensGroup(n, g)] as [string, number, string?]),
+
   Filters: [
     ['ND Filter Set 4x4" (0.3–0.6)', 1],
     ['Clear / Optical Flat Filter 4x5.65"', 1],
@@ -966,17 +1020,22 @@ function addLensFamily(
   mount: string,
   info: string,
   variants: string[],
-  group?: string | null,
+  groupPrefix?: "Prime" | "Zooms" | null,
 ) {
+  const group =
+    groupPrefix && (groupPrefix === "Prime" || groupPrefix === "Zooms")
+      ? `${groupPrefix} · ${lensBrand(label)}`
+      : (groupPrefix ?? null);
   FAMILIES.push({
     cat: "Lenses",
     label,
     info: mount,
     wholeSetSpec: "Set · " + mount + " (" + info + ")",
     variants,
-    group: group ?? null,
+    group,
   });
 }
+
 function addFilterFamily(label: string, grades: string[], setLabelOverride?: string | null) {
   const wholeSetSpec =
     setLabelOverride || "Set (" + grades[0] + " – " + grades[grades.length - 1] + ")";
@@ -2254,7 +2313,15 @@ ZOOM_LENS_FAMILIES.forEach(([name, mount, info, lenses]) =>
   if (f) f.variants.push("45-135mm T2.4", "70-200mm T2.8");
 }
 
+// Normalize lens family groups to manufacturer sub-levels under Prime / Zooms.
+FAMILIES.filter(
+  (f) => f.cat === "Lenses" && (f.group === "Prime" || f.group === "Zooms"),
+).forEach((f) => {
+  f.group = `${f.group} · ${lensBrand(f.label)}`;
+});
+
 // Numeric sort key for "33mm" / "15-40mm" tokens.
+
 function mmSortKey(m: string) {
   const n = parseFloat(m);
   return isNaN(n) ? Infinity : n;
