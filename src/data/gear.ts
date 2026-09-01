@@ -261,7 +261,7 @@ const GEAR: Record<string, [string, number, string?][]> = {
     ),
   ],
 
-  Lenses: [
+  Lenses: ([
     ["Leitz Hugo Set · LPL · Metric (21-24-28-35-50-75-90mm T1.5 + 50-N T1.0)", 1, "Prime"],
     ["ARRI Zeiss Master Macro 100mm T2.0 · PL", 1, "Prime"],
     ["Atlas LF Extender 1.6x", 1],
@@ -283,7 +283,8 @@ const GEAR: Record<string, [string, number, string?][]> = {
     ["Panavision Ultra Vista 1.6x Anamorphic Set", 1, "Prime"],
     ["Panavision Primo Zoom SLZ 24-275mm T2.8", 1, "Zooms"],
     ["Panavision Primo Zoom AWZ2 40-80mm T2.8", 1, "Zooms"],
-  ],
+  ] as [string, number, string?][]).map(([n, q, g]) => [n, q, lensGroup(n, g)] as [string, number, string?]),
+
   Filters: [
     ['ND Filter Set 4x4" (0.3–0.6)', 1],
     ['Clear / Optical Flat Filter 4x5.65"', 1],
