@@ -167,6 +167,13 @@ function Index() {
         }
       }
 
+      // Native lens mount for known camera models (user can still change it).
+      const nativeMount = defaultLensMount(clean);
+      if (nativeMount && !next.details?.lensMount) {
+        next.details = { ...(next.details ?? {}), lensMount: nativeMount };
+      }
+
+
       // Auto-assign the next available alphabetical index (A→B→C…) per category.
       next.letterIndex = nextLetterIndex(cat, source?.letterIndex);
       assignedLetter = next.letterIndex;
