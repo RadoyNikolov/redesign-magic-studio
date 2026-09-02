@@ -4,7 +4,7 @@ import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import type { Family } from "@/data/gear";
 import { useChecklist, type Category, type Item, type Status } from "@/lib/checklist-store";
 import { LETTER_INDEX } from "@/lib/letter-index";
-import type { ItemDetails } from "@/lib/item-fields";
+import { defaultLensMount, type ItemDetails } from "@/lib/item-fields";
 import "@/lib/gear-names";
 import { fetchGearNamesFromCloud } from "@/lib/gear-names-remote";
 import { useAdmin } from "@/hooks/useAdmin";
