@@ -67,6 +67,33 @@ export const RATE_OPTIONS = [
   "60 fps",
 ];
 export const LENS_MOUNT_OPTIONS = ["PL", "LPL", "EF", "E", "RF", "MFT", "L-Mount", "G-Mount"];
+export const ARRI_MOUNT_OPTIONS = ["PL", "LPL"];
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** ARRI bodies whose native mount is LPL — checked before the PL list. */
+const ARRI_LPL = [
+  "alexa 35 xtreme",
+  "alexa 35",
+  "alexa mini lf",
+  "alexa lf",
+  "alexa 65",
+  "alexa 265",
+];
+const ARRI_PL = ["alexa sxt", "alexa stx", "alexa mini", "amira"];
+
+/** Native mount for a camera model, or null when unknown. */
+export function defaultLensMount(itemName: string): string | null {
+  if (brandOf(itemName) !== "ARRI") return null;
+  const n = norm(itemName);
+  if (ARRI_LPL.some((m) => n.includes(m))) return "LPL";
+  if (ARRI_PL.some((m) => n.includes(m))) return "PL";
+  return null;
+}
+
+export function lensMountOptionsFor(itemName: string): string[] {
+  return brandOf(itemName) === "ARRI" ? ARRI_MOUNT_OPTIONS : LENS_MOUNT_OPTIONS;
+}
 
 const CAMERA_FIELDS: FieldDef[] = [
   {
@@ -84,7 +111,7 @@ const CAMERA_FIELDS: FieldDef[] = [
     kind: "select",
     options: ["1.00", "1.33:1", "1.78:1", "1.85:1", "2.00:1", "2.39:1", "2.35:1"],
   },
-  { key: "lensMount", label: "Lens Mount", kind: "select", options: LENS_MOUNT_OPTIONS },
+  { key: "lensMount", label: "Lens Mount", kind: "select", optionsFor: lensMountOptionsFor },
   { key: "serial", label: "Serial Number", kind: "text", placeholder: "e.g. 12345" },
   { key: "provider", label: "Provider", kind: "select" },
   { key: "notes", label: "Notes", kind: "textarea" },
