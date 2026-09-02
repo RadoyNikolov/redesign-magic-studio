@@ -111,7 +111,7 @@ const CAMERA_FIELDS: FieldDef[] = [
     kind: "select",
     options: ["1.00", "1.33:1", "1.78:1", "1.85:1", "2.00:1", "2.39:1", "2.35:1"],
   },
-  { key: "lensMount", label: "Lens Mount", kind: "select", options: LENS_MOUNT_OPTIONS },
+  { key: "lensMount", label: "Lens Mount", kind: "select", optionsFor: lensMountOptionsFor },
   { key: "serial", label: "Serial Number", kind: "text", placeholder: "e.g. 12345" },
   { key: "provider", label: "Provider", kind: "select" },
   { key: "notes", label: "Notes", kind: "textarea" },
