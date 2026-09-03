@@ -18,26 +18,35 @@ export type Database = {
         Row: {
           cat: string
           group: string | null
+          info: string | null
           key: string
           kind: string
           name: string | null
+          parent: string | null
           updated_at: string
+          whole_set_spec: string | null
         }
         Insert: {
           cat: string
           group?: string | null
+          info?: string | null
           key: string
           kind: string
           name?: string | null
+          parent?: string | null
           updated_at?: string
+          whole_set_spec?: string | null
         }
         Update: {
           cat?: string
           group?: string | null
+          info?: string | null
           key?: string
           kind?: string
           name?: string | null
+          parent?: string | null
           updated_at?: string
+          whole_set_spec?: string | null
         }
         Relationships: []
       }
