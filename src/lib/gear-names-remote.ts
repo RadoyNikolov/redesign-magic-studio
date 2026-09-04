@@ -53,12 +53,13 @@ export async function fetchGearNamesFromCloud() {
         variants.push({ key: row.key, parentKey: row.parent ?? "", name: row.name ?? "" });
         break;
       case "move":
-        moves[row.parent && row.name === "__parent__" ? row.key : row.key] = {
+        moves[row.parent ?? row.name ?? row.key] = {
           cat: row.cat,
           group: row.group ?? null,
-          parent: row.kind === "move" ? (row.info ?? null) : null,
+          parent: row.info ?? null,
         };
         break;
+
       default:
         hidden.push(row.key);
     }
