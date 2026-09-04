@@ -74,11 +74,21 @@ function Index() {
 
   useEffect(() => {
     fetchGearNamesFromCloud()
-      .then(() => setNamesVersion((v) => v + 1))
+      .then(() => {
+        setNamesVersion((v) => v + 1);
+        // categories created in the editor must appear in this checklist too
+        mutate((d) => {
+          const existing = new Set(d.categories.map((c) => c.name));
+          Object.keys(GEAR).forEach((name) => {
+            if (!existing.has(name)) d.categories.push({ id: uid(), name, collapsed: true, items: [] });
+          });
+        });
+      })
       .catch(() => {
         /* offline / not reachable — keep the locally cached names */
       });
-  }, []);
+  }, [mutate]);
+
 
 
   const toast = useCallback((msg: string) => {
