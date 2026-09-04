@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { catColor, extractMm, mmSortKey, uid } from "@/data/gear";
+import { GEAR, catColor, extractMm, mmSortKey, uid } from "@/data/gear";
 import type { Family } from "@/data/gear";
 import { useChecklist, type Category, type Item, type Status } from "@/lib/checklist-store";
 import { LETTER_INDEX } from "@/lib/letter-index";
@@ -74,11 +74,21 @@ function Index() {
 
   useEffect(() => {
     fetchGearNamesFromCloud()
-      .then(() => setNamesVersion((v) => v + 1))
+      .then(() => {
+        setNamesVersion((v) => v + 1);
+        // categories created in the editor must appear in this checklist too
+        mutate((d) => {
+          const existing = new Set(d.categories.map((c) => c.name));
+          Object.keys(GEAR).forEach((name) => {
+            if (!existing.has(name)) d.categories.push({ id: uid(), name, collapsed: true, items: [] });
+          });
+        });
+      })
       .catch(() => {
         /* offline / not reachable — keep the locally cached names */
       });
-  }, []);
+  }, [mutate]);
+
 
 
   const toast = useCallback((msg: string) => {
