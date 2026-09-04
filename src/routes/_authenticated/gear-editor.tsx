@@ -76,7 +76,7 @@ function GearEditor() {
   const [newGroup, setNewGroup] = useState("");
   const [newName, setNewName] = useState("");
 
-  const [setCat, setSetCat] = useState("");
+  const [famCat, setFamCat] = useState("");
   const [setGroup, setSetGroup] = useState("");
   const [setLabel, setSetLabel] = useState("");
   const [setInfo, setSetInfo] = useState("");
@@ -88,7 +88,7 @@ function GearEditor() {
 
   const allCats = useMemo(() => listCategories(), [version]);
   const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
-  const setGroupOptions = useMemo(() => (setCat ? listGroups(setCat) : []), [setCat, version]);
+  const setGroupOptions = useMemo(() => (famCat ? listGroups(setCat) : []), [famCat, version]);
   const counts = useMemo(() => editCounts(), [version]);
   const families = useMemo(
     () => entries.filter((e) => e.kind === "family"),
@@ -113,7 +113,7 @@ function GearEditor() {
 
   const addSet = async () => {
     const created = addGearFamily({
-      cat: setCat,
+      cat: famCat,
       group: setGroup || null,
       label: setLabel,
       info: setInfo || null,
@@ -375,9 +375,9 @@ function GearEditor() {
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <select
             className={`${inputCls}`}
-            value={setCat}
+            value={famCat}
             onChange={(e) => {
-              setSetCat(e.target.value);
+              setFamCat(e.target.value);
               setSetGroup("");
             }}
           >
@@ -394,7 +394,7 @@ function GearEditor() {
             placeholder="Sub-group, e.g. Prime · ARRI"
             value={setGroup}
             onChange={(e) => setSetGroup(e.target.value)}
-            disabled={!setCat}
+            disabled={!famCat}
           />
           <datalist id="set-group-options">
             {setGroupOptions.map((g) => (
@@ -423,7 +423,7 @@ function GearEditor() {
         <button
           type="button"
           onClick={() => void addSet()}
-          disabled={!setCat || !setLabel.trim()}
+          disabled={!famCat || !setLabel.trim()}
           className="mt-3 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
         >
           Create set
