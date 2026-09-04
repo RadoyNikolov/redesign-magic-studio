@@ -88,7 +88,7 @@ function GearEditor() {
 
   const allCats = useMemo(() => listCategories(), [version]);
   const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
-  const setGroupOptions = useMemo(() => (famCat ? listGroups(setCat) : []), [famCat, version]);
+  const setGroupOptions = useMemo(() => (famCat ? listGroups(famCat) : []), [famCat, version]);
   const counts = useMemo(() => editCounts(), [version]);
   const families = useMemo(
     () => entries.filter((e) => e.kind === "family"),
