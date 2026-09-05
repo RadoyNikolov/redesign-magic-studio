@@ -560,7 +560,10 @@ function GearEditor() {
         <select
           className={`${inputCls} sm:w-56`}
           value={cat}
-          onChange={(e) => setCat(e.target.value)}
+          onChange={(e) => {
+            setCat(e.target.value);
+            setSetFilter("all");
+          }}
         >
           {cats.map((c) => (
             <option key={c} value={c}>
@@ -568,11 +571,33 @@ function GearEditor() {
             </option>
           ))}
         </select>
+        <select
+          className={`${inputCls} sm:w-64`}
+          value={setFilter}
+          onChange={(e) => {
+            const key = e.target.value;
+            setSetFilter(key);
+            if (key !== "all") {
+              const fam = families.find((f) => f.key === key);
+              if (fam) setCat(fam.cat);
+              setOpenSet(key);
+              setLensDraft("");
+            }
+          }}
+          title="Focus on a single lens set"
+        >
+          <option value="all">All sets (collapsed)</option>
+          {setOptions.map((f) => (
+            <option key={f.key} value={f.key}>
+              {f.cat} · {f.current}
+            </option>
+          ))}
+        </select>
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        {filtered.length} match(es)
-        {filtered.length > shown.length ? ` — showing first ${shown.length}, refine the search` : ""}
+        {topRows.length} match(es)
+        {topRows.length > shown.length ? ` — showing first ${shown.length}, refine the search` : ""}
       </p>
 
       <div className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
