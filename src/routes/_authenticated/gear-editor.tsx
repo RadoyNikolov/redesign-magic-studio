@@ -232,7 +232,69 @@ function GearEditor() {
     });
   }, [entries, q, cat]);
 
-  const shown = filtered.slice(0, 400);
+  /** Top-level rows — variants live inside their set, not in the main list. */
+  const topRows = useMemo(
+    () =>
+      filtered.filter((e) => {
+        if (e.kind === "variant") return false;
+        if (setFilter !== "all" && e.kind === "family") return e.key === setFilter;
+        if (setFilter !== "all") return false;
+        return true;
+      }),
+    [filtered, setFilter],
+  );
+
+  /** family key → its lens entries (respecting the search filter) */
+  const variantsBySet = useMemo(() => {
+    const map = new Map<string, GearEntry[]>();
+    filtered.forEach((e) => {
+      if (e.kind !== "variant" || !e.parentKey) return;
+      const list = map.get(e.parentKey) ?? [];
+      list.push(e);
+      map.set(e.parentKey, list);
+    });
+    return map;
+  }, [filtered]);
+
+  /** All lenses of a set, regardless of the search filter (for the open set). */
+  const allVariantsBySet = useMemo(() => {
+    const map = new Map<string, GearEntry[]>();
+    entries.forEach((e) => {
+      if (e.kind !== "variant" || !e.parentKey) return;
+      const list = map.get(e.parentKey) ?? [];
+      list.push(e);
+      map.set(e.parentKey, list);
+    });
+    return map;
+  }, [entries]);
+
+  /** Sets that contain a lens matching the current search — auto-expanded. */
+  const searchMatchedSets = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    const found = new Set<string>();
+    if (!query) return found;
+    entries.forEach((e) => {
+      if (e.kind !== "variant" || !e.parentKey) return;
+      if (
+        e.current.toLowerCase().includes(query) ||
+        e.original.toLowerCase().includes(query)
+      ) {
+        found.add(e.parentKey);
+      }
+    });
+    return found;
+  }, [entries, q]);
+
+  /** Set choices for the focus dropdown, narrowed by the category filter. */
+  const setOptions = useMemo(
+    () =>
+      families
+        .filter((f) => cat === "All" || f.cat === cat)
+        .sort((a, b) => a.cat.localeCompare(b.cat) || a.current.localeCompare(b.current)),
+    [families, cat],
+  );
+
+  const shown = topRows.slice(0, 400);
   const dirty = Object.keys(drafts).length;
 
   const save = async () => {
