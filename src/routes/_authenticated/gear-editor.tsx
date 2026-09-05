@@ -82,9 +82,11 @@ function GearEditor() {
   const [setInfo, setSetInfo] = useState("");
   const [setWhole, setSetWhole] = useState("");
 
-  /** family key currently showing its "add lens" field */
+  /** family key currently expanded (lenses + add-lens field) */
   const [openSet, setOpenSet] = useState<string | null>(null);
   const [lensDraft, setLensDraft] = useState("");
+  /** "all" = show every set collapsed; otherwise a family key to focus on */
+  const [setFilter, setSetFilter] = useState<string>("all");
 
   const allCats = useMemo(() => listCategories(), [version]);
   const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
