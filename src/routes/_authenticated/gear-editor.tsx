@@ -604,7 +604,11 @@ function GearEditor() {
         {shown.map((e) => {
           const value = drafts[e.key] ?? e.current;
           const changed = value !== e.current;
-          const isOpen = openSet === e.key;
+          const expanded =
+            e.kind === "family" && (openSet === e.key || searchMatchedSets.has(e.key));
+          const lenses = expanded ? (allVariantsBySet.get(e.key) ?? []) : [];
+          const matchCount = variantsBySet.get(e.key)?.length ?? 0;
+          const totalCount = allVariantsBySet.get(e.key)?.length ?? 0;
           return (
             <div key={e.key} className="px-3 py-2.5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -612,7 +616,7 @@ function GearEditor() {
                   <span className="slate-label truncate">{e.cat}</span>
                   <span className="truncate text-[11px] text-muted-foreground">
                     {KIND_LABEL[e.kind]}
-                    {e.parent ? ` · ${e.parent}` : e.group ? ` · ${e.group}` : ""}
+                    {e.group ? ` · ${e.group}` : ""}
                   </span>
                 </div>
                 <input
@@ -635,12 +639,14 @@ function GearEditor() {
                   <button
                     type="button"
                     onClick={() => {
-                      setOpenSet(isOpen ? null : e.key);
+                      setOpenSet(openSet === e.key ? null : e.key);
                       setLensDraft("");
                     }}
+                    title={expanded ? "Collapse lenses" : "Show lenses"}
                     className="shrink-0 rounded-md border border-border px-2 py-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    {isOpen ? "Close" : "Add lens"}
+                    {expanded ? "▴" : "▾"} {totalCount}{" "}
+                    {totalCount === 1 ? "lens" : "lenses"}
                   </button>
                 )}
                 <button
@@ -653,69 +659,108 @@ function GearEditor() {
                 </button>
               </div>
 
-              <div className="mt-2 flex flex-wrap items-center gap-2 sm:pl-52">
-                <span className="text-[11px] text-muted-foreground">Move to</span>
-                {e.kind === "variant" ? (
+              {!expanded && (
+                <div className="mt-2 flex flex-wrap items-center gap-2 sm:pl-52">
+                  <span className="text-[11px] text-muted-foreground">Move to</span>
                   <select
                     className={selectCls}
-                    value={e.parentKey ?? ""}
-                    onChange={(ev) => void move(e, { parent: ev.target.value })}
+                    value={e.cat}
+                    onChange={(ev) => void move(e, { cat: ev.target.value, group: null })}
                   >
-                    {families.map((f) => (
-                      <option key={f.key} value={f.key}>
-                        {f.cat} · {f.current}
+                    {allCats.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
                       </option>
                     ))}
                   </select>
-                ) : (
-                  <>
-                    <select
-                      className={selectCls}
-                      value={e.cat}
-                      onChange={(ev) => void move(e, { cat: ev.target.value, group: null })}
-                    >
-                      {allCats.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      className={selectCls}
-                      value={e.group ?? ""}
-                      onChange={(ev) => void move(e, { group: ev.target.value || null })}
-                    >
-                      <option value="">No sub-group</option>
-                      {listGroups(e.cat).map((g) => (
-                        <option key={g} value={g}>
-                          {g}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                )}
-              </div>
-
-              {e.kind === "family" && isOpen && (
-                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:pl-52">
-                  <input
-                    className={`${inputCls} flex-1`}
-                    placeholder="New lens, e.g. 35mm T2.0 · CF 0.50m · Ø114"
-                    value={lensDraft}
-                    onChange={(ev) => setLensDraft(ev.target.value)}
-                    onKeyDown={(ev) => {
-                      if (ev.key === "Enter") void addLens(e, lensDraft);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => void addLens(e, lensDraft)}
-                    disabled={!lensDraft.trim()}
-                    className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
+                  <select
+                    className={selectCls}
+                    value={e.group ?? ""}
+                    onChange={(ev) => void move(e, { group: ev.target.value || null })}
                   >
-                    Add lens
-                  </button>
+                    <option value="">No sub-group</option>
+                    {listGroups(e.cat).map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+              )}
+
+              {expanded && (
+                <div className="mt-2 rounded-md border border-border/60 bg-elevated/40 sm:ml-52">
+                  {lenses.length === 0 && (
+                    <p className="px-3 py-2 text-xs text-muted-foreground">
+                      No lenses yet — add the first one below.
+                    </p>
+                  )}
+                  {lenses.map((v) => {
+                    const vValue = drafts[v.key] ?? v.current;
+                    const vChanged = vValue !== v.current;
+                    return (
+                      <div
+                        key={v.key}
+                        className="flex flex-col gap-2 border-b border-border/40 px-3 py-2 last:border-b-0 sm:flex-row sm:items-center"
+                      >
+                        <input
+                          className={`min-w-0 flex-1 rounded-md border bg-elevated px-2.5 py-1.5 text-xs text-foreground ${
+                            vChanged ? "border-primary" : "border-border"
+                          }`}
+                          value={vValue}
+                          onChange={(ev) =>
+                            setDrafts((d) => ({ ...d, [v.key]: ev.target.value }))
+                          }
+                        />
+                        <select
+                          className={selectCls}
+                          value={v.parentKey ?? ""}
+                          title="Move lens to another set"
+                          onChange={(ev) => void move(v, { parent: ev.target.value })}
+                        >
+                          {families.map((f) => (
+                            <option key={f.key} value={f.key}>
+                              {f.cat} · {f.current}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => void removeEntry(v)}
+                          title="Remove lens"
+                          className="shrink-0 rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    );
+                  })}
+                  <div className="flex flex-col gap-2 px-3 py-2 sm:flex-row">
+                    <input
+                      className={`${inputCls} flex-1`}
+                      placeholder="New lens, e.g. 35mm T2.0 · CF 0.50m · Ø114"
+                      value={lensDraft}
+                      onChange={(ev) => setLensDraft(ev.target.value)}
+                      onKeyDown={(ev) => {
+                        if (ev.key === "Enter") void addLens(e, lensDraft);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void addLens(e, lensDraft)}
+                      disabled={!lensDraft.trim()}
+                      className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
+                    >
+                      Add lens
+                    </button>
+                  </div>
+                </div>
+              )}
+              {e.kind === "family" && !expanded && matchCount > 0 && q.trim() && (
+                <p className="mt-1 text-[11px] text-muted-foreground sm:pl-52">
+                  {matchCount} matching {matchCount === 1 ? "lens" : "lenses"} inside — click ▾ to
+                  open
+                </p>
               )}
             </div>
           );
