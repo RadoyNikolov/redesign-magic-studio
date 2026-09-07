@@ -87,6 +87,8 @@ function GearEditor() {
   const [lensDraft, setLensDraft] = useState("");
   /** "all" = show every set collapsed; otherwise a family key to focus on */
   const [setFilter, setSetFilter] = useState<string>("all");
+  /** manufacturer sub-group headers currently expanded */
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
   const allCats = useMemo(() => listCategories(), [version]);
   const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
