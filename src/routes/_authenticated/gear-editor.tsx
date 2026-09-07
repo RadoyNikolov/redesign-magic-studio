@@ -296,7 +296,38 @@ function GearEditor() {
     [families, cat],
   );
 
-  const shown = topRows.slice(0, 400);
+  /** Rows bucketed into manufacturer sub-groups, like the checklist picker. */
+  const groupedRows = useMemo(() => {
+    const map = new Map<string, { key: string; cat: string; group: string | null; rows: GearEntry[] }>();
+    topRows.forEach((e) => {
+      const key = `${e.cat}||${e.group ?? ""}`;
+      const bucket = map.get(key) ?? { key, cat: e.cat, group: e.group ?? null, rows: [] };
+      bucket.rows.push(e);
+      map.set(key, bucket);
+    });
+    return Array.from(map.values()).sort(
+      (a, b) =>
+        a.cat.localeCompare(b.cat) ||
+        (a.group ? 0 : 1) - (b.group ? 0 : 1) ||
+        (a.group ?? "").localeCompare(b.group ?? ""),
+    );
+  }, [topRows]);
+
+  const searching = q.trim().length > 0;
+
+  /** Apply the row cap across groups so long catalogues stay responsive. */
+  const shownGroups = useMemo(() => {
+    let budget = 400;
+    const out: typeof groupedRows = [];
+    for (const g of groupedRows) {
+      if (budget <= 0) break;
+      out.push(g.rows.length <= budget ? g : { ...g, rows: g.rows.slice(0, budget) });
+      budget -= g.rows.length;
+    }
+    return out;
+  }, [groupedRows]);
+
+  const shownCount = shownGroups.reduce((n, g) => n + g.rows.length, 0);
   const dirty = Object.keys(drafts).length;
 
   const save = async () => {
