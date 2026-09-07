@@ -87,6 +87,8 @@ function GearEditor() {
   const [lensDraft, setLensDraft] = useState("");
   /** "all" = show every set collapsed; otherwise a family key to focus on */
   const [setFilter, setSetFilter] = useState<string>("all");
+  /** manufacturer sub-group headers currently expanded */
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
   const allCats = useMemo(() => listCategories(), [version]);
   const groupOptions = useMemo(() => (newCat ? listGroups(newCat) : []), [newCat, version]);
@@ -294,7 +296,38 @@ function GearEditor() {
     [families, cat],
   );
 
-  const shown = topRows.slice(0, 400);
+  /** Rows bucketed into manufacturer sub-groups, like the checklist picker. */
+  const groupedRows = useMemo(() => {
+    const map = new Map<string, { key: string; cat: string; group: string | null; rows: GearEntry[] }>();
+    topRows.forEach((e) => {
+      const key = `${e.cat}||${e.group ?? ""}`;
+      const bucket = map.get(key) ?? { key, cat: e.cat, group: e.group ?? null, rows: [] };
+      bucket.rows.push(e);
+      map.set(key, bucket);
+    });
+    return Array.from(map.values()).sort(
+      (a, b) =>
+        a.cat.localeCompare(b.cat) ||
+        (a.group ? 0 : 1) - (b.group ? 0 : 1) ||
+        (a.group ?? "").localeCompare(b.group ?? ""),
+    );
+  }, [topRows]);
+
+  const searching = q.trim().length > 0;
+
+  /** Apply the row cap across groups so long catalogues stay responsive. */
+  const shownGroups = useMemo(() => {
+    let budget = 400;
+    const out: typeof groupedRows = [];
+    for (const g of groupedRows) {
+      if (budget <= 0) break;
+      out.push(g.rows.length <= budget ? g : { ...g, rows: g.rows.slice(0, budget) });
+      budget -= g.rows.length;
+    }
+    return out;
+  }, [groupedRows]);
+
+  const shownCount = shownGroups.reduce((n, g) => n + g.rows.length, 0);
   const dirty = Object.keys(drafts).length;
 
   const save = async () => {
@@ -596,20 +629,48 @@ function GearEditor() {
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        {topRows.length} match(es)
-        {topRows.length > shown.length ? ` — showing first ${shown.length}, refine the search` : ""}
+        {topRows.length} match(es) in {groupedRows.length} group(s)
+        {topRows.length > shownCount ? ` — showing first ${shownCount}, refine the search` : ""}
       </p>
 
       <div className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
-        {shown.map((e) => {
-          const value = drafts[e.key] ?? e.current;
-          const changed = value !== e.current;
-          const expanded =
-            e.kind === "family" && (openSet === e.key || searchMatchedSets.has(e.key));
-          const lenses = expanded ? (allVariantsBySet.get(e.key) ?? []) : [];
-          const matchCount = variantsBySet.get(e.key)?.length ?? 0;
-          const totalCount = allVariantsBySet.get(e.key)?.length ?? 0;
+        {shownGroups.map((g) => {
+          const groupOpen = searching || openGroups.has(g.key);
           return (
+            <div key={g.key}>
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenGroups((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(g.key)) next.delete(g.key);
+                    else next.add(g.key);
+                    return next;
+                  })
+                }
+                className="flex w-full items-center gap-2 bg-elevated/60 px-3 py-2 text-left transition-colors hover:bg-accent"
+              >
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary">
+                  {groupOpen ? "▾" : "▸"}
+                </span>
+                <span className="slate-label truncate">{g.cat}</span>
+                <span className="truncate text-sm text-foreground">
+                  {g.group ?? "Without sub-group"}
+                </span>
+                <span className="ml-auto shrink-0 text-[11px] text-muted-foreground">
+                  {g.rows.length}
+                </span>
+              </button>
+              {groupOpen &&
+                g.rows.map((e) => {
+                  const value = drafts[e.key] ?? e.current;
+                  const changed = value !== e.current;
+                  const expanded =
+                    e.kind === "family" && (openSet === e.key || searchMatchedSets.has(e.key));
+                  const lenses = expanded ? (allVariantsBySet.get(e.key) ?? []) : [];
+                  const matchCount = variantsBySet.get(e.key)?.length ?? 0;
+                  const totalCount = allVariantsBySet.get(e.key)?.length ?? 0;
+                  return (
             <div key={e.key} className="px-3 py-2.5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div className="flex min-w-0 shrink-0 flex-col sm:w-52">
@@ -763,9 +824,12 @@ function GearEditor() {
                 </p>
               )}
             </div>
+                );
+              })}
+            </div>
           );
         })}
-        {shown.length === 0 && (
+        {shownCount === 0 && (
           <p className="px-3 py-6 text-center text-sm text-muted-foreground">No matches.</p>
         )}
       </div>
