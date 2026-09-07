@@ -796,9 +796,12 @@ function GearEditor() {
                 </p>
               )}
             </div>
+                );
+              })}
+            </div>
           );
         })}
-        {shown.length === 0 && (
+        {shownCount === 0 && (
           <p className="px-3 py-6 text-center text-sm text-muted-foreground">No matches.</p>
         )}
       </div>
