@@ -629,20 +629,48 @@ function GearEditor() {
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        {topRows.length} match(es)
-        {topRows.length > shown.length ? ` — showing first ${shown.length}, refine the search` : ""}
+        {topRows.length} match(es) in {groupedRows.length} group(s)
+        {topRows.length > shownCount ? ` — showing first ${shownCount}, refine the search` : ""}
       </p>
 
       <div className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
-        {shown.map((e) => {
-          const value = drafts[e.key] ?? e.current;
-          const changed = value !== e.current;
-          const expanded =
-            e.kind === "family" && (openSet === e.key || searchMatchedSets.has(e.key));
-          const lenses = expanded ? (allVariantsBySet.get(e.key) ?? []) : [];
-          const matchCount = variantsBySet.get(e.key)?.length ?? 0;
-          const totalCount = allVariantsBySet.get(e.key)?.length ?? 0;
+        {shownGroups.map((g) => {
+          const groupOpen = searching || openGroups.has(g.key);
           return (
+            <div key={g.key}>
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenGroups((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(g.key)) next.delete(g.key);
+                    else next.add(g.key);
+                    return next;
+                  })
+                }
+                className="flex w-full items-center gap-2 bg-elevated/60 px-3 py-2 text-left transition-colors hover:bg-accent"
+              >
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary">
+                  {groupOpen ? "▾" : "▸"}
+                </span>
+                <span className="slate-label truncate">{g.cat}</span>
+                <span className="truncate text-sm text-foreground">
+                  {g.group ?? "Without sub-group"}
+                </span>
+                <span className="ml-auto shrink-0 text-[11px] text-muted-foreground">
+                  {g.rows.length}
+                </span>
+              </button>
+              {groupOpen &&
+                g.rows.map((e) => {
+                  const value = drafts[e.key] ?? e.current;
+                  const changed = value !== e.current;
+                  const expanded =
+                    e.kind === "family" && (openSet === e.key || searchMatchedSets.has(e.key));
+                  const lenses = expanded ? (allVariantsBySet.get(e.key) ?? []) : [];
+                  const matchCount = variantsBySet.get(e.key)?.length ?? 0;
+                  const totalCount = allVariantsBySet.get(e.key)?.length ?? 0;
+                  return (
             <div key={e.key} className="px-3 py-2.5">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div className="flex min-w-0 shrink-0 flex-col sm:w-52">
