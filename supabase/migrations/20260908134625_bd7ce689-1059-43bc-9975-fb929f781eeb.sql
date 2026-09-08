@@ -1,0 +1,2 @@
+ALTER TABLE public.gear_catalog_edits DROP CONSTRAINT IF EXISTS gear_catalog_edits_kind_check;
+ALTER TABLE public.gear_catalog_edits ADD CONSTRAINT gear_catalog_edits_kind_check CHECK (kind = ANY (ARRAY['custom','hidden','move','customCategory','customFamily','customVariant']));
